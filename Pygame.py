@@ -16,7 +16,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    scroll += 1
+    scroll += 1 #teste
     if scroll >= 50:
         # remover a ultima linha e adicionar uma nova
         grid.pop(0)
