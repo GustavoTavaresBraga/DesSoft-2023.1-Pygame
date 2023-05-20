@@ -2,6 +2,7 @@ import pygame
 import random
 from chicken import Player
 from funcoes import *
+
 pygame.init()
 clock = pygame.time.Clock()
 tela = pygame.display.set_mode((500, 800)) # criar uma tela retangular
