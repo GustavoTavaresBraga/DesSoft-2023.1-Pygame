@@ -2,7 +2,6 @@ import pygame
 import random
 from chicken import Player
 from funcoes import *
-
 pygame.init()
 clock = pygame.time.Clock()
 tela = pygame.display.set_mode((500, 800)) # criar uma tela retangular
@@ -17,7 +16,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    scroll += 1 #teste
+    scroll += 1
     if scroll >= 50:
         # remover a ultima linha e adicionar uma nova
         grid.pop(0)
