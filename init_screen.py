@@ -8,7 +8,7 @@ PLAYING = 1
 END = 2
 
 font = pygame.font.SysFont(None, 60)
-start = font.render('START GAME', True, (255, 255, 255))
+start = font.render('START GAME', True, (0, 0, 0))
 
 start_position = (50, 100)
 
