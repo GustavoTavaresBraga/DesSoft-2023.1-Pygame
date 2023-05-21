@@ -15,8 +15,6 @@ start_position = (50, 100)
 def init_screen(screen):
     clock = pygame.time.Clock()
 
-    
-
     running = True
     while running:
         clock.tick(FPS)
