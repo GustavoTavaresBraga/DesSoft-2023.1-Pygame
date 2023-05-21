@@ -42,4 +42,8 @@ class Player():
             if self.moveu == 25:
                 self.movimento = None
                 self.moveu = 0
-        
+    def checarMorte(self, blocos, barcos):
+        for i in blocos:
+            if i[2] == 'agua' and self.rect.colliderect(i[1]):
+                return True # falta fazer o barco funcionar
+        return False
