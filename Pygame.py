@@ -23,8 +23,6 @@ while running:
         tela.blit(sprites['barco'], (i[0], i[1]))
     blocos.updateBlocos()
     player.update(blocos.blocos, blocos.barcos)
-    if player.checarMorte(blocos.blocos, blocos.barcos):
-        running = False
     tela.blit(player.image, player.rect)
     pygame.display.update()
 pygame.quit()
