@@ -17,6 +17,8 @@ class Player():
         if keys[pygame.K_RIGHT] and self.movimento is None: self.movimento = 'direita'
 
         self.rect.bottom += 1 # Mexer a galinha pra baixo
+        if self.noBarco:
+            self.rect.centerx -= 1
         if self.movimento == 'cima':
             self.rect.y -= 2
             self.moveu +=1
@@ -43,8 +45,14 @@ class Player():
             if self.moveu == 25:
                 self.movimento = None
                 self.moveu = 0
-    def checarMorte(self, blocos, barcos):
+
+        #conferir estado
+        self.noBarco = False
         for i in blocos:
             if i[2] == 'agua' and self.rect.colliderect(i[1]):
-                return True # falta fazer o barco funcionar
+                for barco in barcos:
+                    if abs(self.rect.centerx - barco.centerx) < 50 and abs(self.rect.bottom - barco.bottom) < 50:
+                        self.noBarco = True
+                if not self.noBarco:
+                    pygame.quit() # falta fazer o barco funcionar
         return False

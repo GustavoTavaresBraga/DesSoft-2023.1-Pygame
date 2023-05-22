@@ -12,7 +12,10 @@ class Blocos():
             centro = 25
             for block in row:
                 if block == 'agua' and random.randint(0, 2) == 0: # 1/3 de chance de gerar um barco, por bloco de agua
-                    self.barcos.append([centro, y-50])
+                    barco = sprites['barco'].get_rect()
+                    barco.centerx = centro
+                    barco.bottom = y
+                    self.barcos.append(barco)
                 bloco = sprites[block].get_rect()
                 bloco.centerx = centro
                 bloco.bottom = y
@@ -29,20 +32,26 @@ class Blocos():
     def updateBlocos(self):
         for i in self.blocos:
             i[1].bottom += 1
-        for i in self.barcos:
-            i[0] -= 1
-            i[1] +=1
-            if i[0] < -50:
-                i[0] = 550
+        for barco in self.barcos:
+            barco.centerx -= 1
+            barco.bottom += 1
+            if barco.centerx < -50:
+                barco.centerx = 550
+            if barco.bottom > 800:
+                self.barcos.remove(barco)
         if self.frame == 0: # Gerar uma nova fileira em cima
+            self.nova_fileira()
             self.frame = -50
-            block = random.choice(['grama', 'agua', 'trilho'])
-            for i in range(10):
-                if block == 'agua' and random.randint(0, 2) == 0: # 1/3 de chance de gerar um barco, por bloco de agua
-                    self.barcos.append([i*50+25, -50])
-                bloco = sprites[block].get_rect()
-                bloco.centerx = i * 50 + 25
-                bloco.bottom = 0
-                self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
-        self.frame += 1
-   
+        self.frame += 1 
+    def nova_fileira(self):
+        block = random.choice(['grama', 'agua', 'trilho'])
+        for i in range(10):
+            if block == 'agua' and random.randint(0, 2) == 0: # 1/3 de chance de gerar um barco, por bloco de agua
+                barco = sprites['barco'].get_rect()
+                barco.centerx = i * 50 + 25
+                barco.bottom = 0
+                self.barcos.append(barco)
+            bloco = sprites[block].get_rect()
+            bloco.centerx = i * 50 + 25
+            bloco.bottom = 0
+            self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
