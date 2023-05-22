@@ -1,13 +1,12 @@
 import pygame
 from os import *
 from constantes import *
-
-font = pygame.font.SysFont(None, 60)
-start = font.render('START GAME', True, (0, 0, 0))
-
-start_position = (50, 100)
+from sprites import *
 
 def init_screen(screen):
+
+    start_position = (20, 20)
+
     clock = pygame.time.Clock()
 
     running = True
@@ -22,8 +21,8 @@ def init_screen(screen):
                 state = PLAYING
                 running = False
         
-        screen.fill(0, 0, 0)
-        screen.blit(start, start_position)
+        screen.fill((0, 0, 0))
+        screen.blit(sprites['start'], start_position)
 
         pygame.display.flip()
     
