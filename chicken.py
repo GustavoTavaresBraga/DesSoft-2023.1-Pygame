@@ -17,7 +17,6 @@ class Player():
         if keys[pygame.K_RIGHT] and self.movimento is None: self.movimento = 'direita'
 
         self.rect.bottom += 1 # Mexer a galinha pra baixo
-        
         if self.movimento == 'cima':
             self.rect.y -= 2
             self.moveu +=1
