@@ -1,11 +1,6 @@
 import pygame
 from os import *
-
-FPS = 30
-
-INITIAL = 0
-PLAYING = 1
-END = 2
+from constantes import *
 
 font = pygame.font.SysFont(None, 60)
 start = font.render('START GAME', True, (0, 0, 0))
