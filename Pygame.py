@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 
 blocos = Blocos()
 player = Player()
-
+global running
 running = True
 while running:
     clock.tick(30)
