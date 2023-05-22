@@ -5,7 +5,7 @@ from sprites import *
 
 def init_screen(screen):
 
-    start_position = (20, 20)
+    start_position = (250, 400)
 
     clock = pygame.time.Clock()
 
