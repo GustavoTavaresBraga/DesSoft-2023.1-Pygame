@@ -9,7 +9,7 @@ class Player():
         self.movimento = None
         self.moveu = 0
         self.noBarco = False
-    def update(self, blocos, barcos):
+    def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movimento is None: self.movimento = 'cima'
         if keys[pygame.K_DOWN] and self.movimento is None: self.movimento = 'baixo'
@@ -47,6 +47,8 @@ class Player():
                 self.moveu = 0
 
         #conferir estado
+        
+    def checarMorte(self, blocos, barcos):
         self.noBarco = False
         for i in blocos:
             if i[2] == 'agua' and self.rect.colliderect(i[1]):
@@ -54,5 +56,5 @@ class Player():
                     if abs(self.rect.centerx - barco.centerx) < 50 and abs(self.rect.bottom - barco.bottom) < 50:
                         self.noBarco = True
                 if not self.noBarco:
-                    pygame.quit() # falta fazer o barco funcionar
+                    return True
         return False
