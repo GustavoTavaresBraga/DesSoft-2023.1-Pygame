@@ -1,4 +1,5 @@
 import pygame
+
 class Player():
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -9,6 +10,7 @@ class Player():
         self.movimento = None
         self.moveu = 0
         self.noBarco = False
+
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movimento is None: self.movimento = 'cima'

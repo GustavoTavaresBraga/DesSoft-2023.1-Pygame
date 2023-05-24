@@ -20,4 +20,5 @@ def game_loop():
     while tela_atual.update(): 
         tela_atual = tela_atual.troca_tela()
         tela_atual.desenha()
+        
 game_loop()

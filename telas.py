@@ -2,6 +2,7 @@ import pygame
 import random
 from sprites import sprites
 from chicken import Player
+
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
@@ -11,6 +12,7 @@ class TelaInicial():
         self.botaoSair = pygame.Rect(55, 510, 425, 40)
         self.play = False
         self.ranking = False
+        
     def desenha(self):
         self.tela.fill((255, 255, 255))
         self.tela.blit(self.fundo, (0, 0))
@@ -39,6 +41,7 @@ class TelaInicial():
             return TelaRanking(self.tela)
         else:
             return self
+        
 class TelaJogo:
     def __init__(self, tela):
         self.blocos = []
@@ -48,6 +51,7 @@ class TelaJogo:
         self.tela = tela
         self.clock = pygame.time.Clock()
         self.player = Player()
+
     def gerarBlocos(self, grid): # Gerar todos os blocos que vão ocupar a tela
         y = 800
         for row in grid:
@@ -65,12 +69,14 @@ class TelaJogo:
                 self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
             centro = 25
             y -= 50
+
     def generateGrid(self):
         grid = []
         for _ in range(16):
             tile = random.choice(['grama', 'agua', 'trilho'])
             grid.append([tile] * 10)
         return grid
+    
     def updateBlocos(self):
         for i in self.blocos:
             i[1].bottom += 1
@@ -85,6 +91,7 @@ class TelaJogo:
             self.nova_fileira()
             self.frame = -50
         self.frame += 1 
+
     def nova_fileira(self):
         block = random.choice(['grama', 'agua', 'trilho'])
         for i in range(10):
@@ -97,6 +104,7 @@ class TelaJogo:
             bloco.centerx = i * 50 + 25
             bloco.bottom = 0
             self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
+    
     def update(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -105,6 +113,7 @@ class TelaJogo:
         self.player.update()
         self.clock.tick(30)
         return True
+    
     def desenha(self):
         for i in self.blocos:
             self.tela.blit(i[0], i[1])
@@ -112,6 +121,7 @@ class TelaJogo:
             self.tela.blit(sprites['barco'], (i[0], i[1]))
         self.tela.blit(self.player.image, self.player.rect)
         pygame.display.update()
+    
     def troca_tela(self):
         if self.player.checarMorte(self.blocos, self.barcos):
             print('morreu')
