@@ -4,7 +4,7 @@ from sprites import sprites
 class Player():
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(pygame.image.load('sprites/chicken.png'), (50, 50))
+        self.image = sprites['chicken']
         self.rect = self.image.get_rect()
         self.rect.centerx = 500 / 2
         self.rect.bottom = 700
@@ -71,7 +71,7 @@ class Player():
             return True
         self.noBarco = False
         for i in self.obstaculos:
-            if i.rect.colliderect(self.rect) and (i.tipo == 'minecart' or i.tipo == 'zumbi'):
+            if i.rect.colliderect(self.rect) and i.tipo == 'minecart':
                 return True
             if i.rect.colliderect(self.rect) and i.tipo == 'barco':
                 self.noBarco = True
