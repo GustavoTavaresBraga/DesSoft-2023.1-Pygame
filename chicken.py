@@ -24,10 +24,10 @@ class Player():
        
         if self.noBarco:
             self.rect.centerx += self.speedBoat
-            if self.rect.centerx < -50:
-                self.rect.centerx = 550
-            if self.rect.centerx > 550:
-                self.rect.centerx = -50
+            if self.rect.centerx < -25:
+                self.rect.centerx = 525
+            if self.rect.centerx > 525:
+                self.rect.centerx = -25
         if self.movimento == 'cima':
             self.rect.y -= 10
             self.moveu +=1
@@ -114,10 +114,10 @@ class Barco():
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
         self.rect.centerx += self.speedX
-        if self.rect.centerx < -50 and self.direcao == -1:
-            self.rect.centerx = 550
-        elif self.rect.centerx > 550 and self.direcao == 1:
-            self.rect.centerx = -50
+        if self.rect.centerx < -25 and self.direcao == -1:
+            self.rect.centerx = 525
+        elif self.rect.centerx > 525 and self.direcao == 1:
+            self.rect.centerx = -25
 class Agua():
     def __init__(self, x, y, player):
         pygame.sprite.Sprite.__init__(self)
