@@ -2,7 +2,6 @@ import pygame
 import random
 from sprites import sprites
 from chicken import *
-import pandas as pd
 global jogador
 class TelaInicial():
     def __init__(self, tela):
