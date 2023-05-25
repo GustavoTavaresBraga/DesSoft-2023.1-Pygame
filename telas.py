@@ -11,7 +11,9 @@ class TelaInicial():
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
         self.botaoSair = pygame.Rect(275, 585, 210, 40)
+        self.botaoOptions = pygame.Rect(55, 585, 210, 40)
         self.play = False
+        self.options = False
         self.ranking = False
         self.caixaTexto = CaixaTexto(self.fonte, tela)
     def desenha(self):
@@ -32,6 +34,8 @@ class TelaInicial():
                     self.play = True
                 elif self.botaoRanking.collidepoint(mouse_x, mouse_y):
                     self.ranking = True
+                elif self.botaoOptions.collidepoint(mouse_x, mouse_y):
+                    self.options = True
                 elif self.botaoSair.collidepoint(mouse_x, mouse_y):
                     pygame.quit()
                     return False
@@ -41,6 +45,8 @@ class TelaInicial():
             return TelaJogo(self.tela, self.caixaTexto.texto)
         elif self.ranking:
             return TelaRanking(self.tela)
+        elif self.options:
+            return self
         else:
             return self
         
@@ -140,7 +146,7 @@ class TelaRanking():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos): # Left mouse button click
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
                 self.voltar = True
         return True
     def troca_tela(self):
