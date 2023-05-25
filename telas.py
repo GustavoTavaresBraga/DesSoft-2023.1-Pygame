@@ -40,7 +40,7 @@ class TelaInicial():
         if self.play:
             return TelaJogo(self.tela, self.caixaTexto.texto)
         elif self.ranking:
-            return TelaInicial(self.tela)
+            return TelaRanking(self.tela)
         else:
             return self
         
@@ -76,10 +76,11 @@ class TelaJogo:
                 Barco(i * 50 + 25, y, self.player, speed, direcao)
             if block == 'trilho' and random.randint(0, 4-self.dificuldade) == 0:Minecart(i * 50 + 25, y, self.player, speed*2 -1, direcao)
     def salvar_highscore(self):
-        string = '\n'+self.nome+','+str(self.player.score)
-        with open('scores.csv', 'a') as f:
-            f.write(string)
-            print(string)
+        if self.nome == '' and self.nome != 'digite seu nome':
+            string = '\n'+self.nome+','+str(self.player.score)
+            with open('scores.csv', 'a') as f:
+                f.write(string)
+                print(string)
     def update(self):
         if self.y == 25: # Gerar uma nova fileira em cima
             self.nova_fileira()
@@ -109,6 +110,41 @@ class TelaJogo:
     def troca_tela(self):
         if self.player.checarMorte():
             self.salvar_highscore()
+            return TelaInicial(self.tela)
+        else:
+            return self
+class TelaRanking():
+    def __init__(self, tela):
+        self.ranking = {}
+        self.tela = tela
+        with open('scores.csv', 'r') as scores:
+            for line in scores:
+                nome, score = line.split(',')
+                self.ranking[nome] = int(score)
+        self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True)
+        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
+        self.botaoSair = pygame.Rect(0, 0, 100, 50)
+        self.voltar = False
+    def desenha(self):
+        self.tela.fill((0, 0, 0))
+        texto1 = self.fonte.render('voltar', True, (255, 255, 255))
+        self.tela.blit(texto1, (0, 0))
+        for i in range(len(self.ranking)):
+            nome, score = self.ranking[i]
+            texto = self.fonte.render(str(i+1)+'. '+nome+' - '+str(score), True, (255, 255, 255))
+            self.tela.blit(texto, (100, 100+i*50))
+        pygame.display.update()
+
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos): # Left mouse button click
+                self.voltar = True
+        return True
+    def troca_tela(self):
+        if self.voltar:
             return TelaInicial(self.tela)
         else:
             return self

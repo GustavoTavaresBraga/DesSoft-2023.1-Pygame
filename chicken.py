@@ -5,9 +5,9 @@ class Player():
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
-        self.rect = self.image.get_rect()
+        self.rect = pygame.Rect(0, 0, 40, 40)
         self.rect.centerx = 500 / 2
-        self.rect.bottom = 700
+        self.rect.bottom = 690
         self.movimento = None
         self.moveu = 0
         self.noBarco = False
