@@ -1,26 +1,29 @@
 import pygame
 import random
 from sprites import sprites
-from chicken import Player
-
+from chicken import *
+import pandas as pd
+global jogador
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
+        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
         self.fundo = pygame.transform.scale((pygame.image.load('sprites/inicio.png').convert_alpha()), (500, 800))
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
-        self.botaoSair = pygame.Rect(55, 510, 425, 40)
+        self.botaoSair = pygame.Rect(275, 585, 210, 40)
         self.play = False
         self.ranking = False
-        
+        self.caixaTexto = CaixaTexto(self.fonte, tela)
     def desenha(self):
         self.tela.fill((255, 255, 255))
         self.tela.blit(self.fundo, (0, 0))
+        self.caixaTexto.desenha()
         pygame.display.update()
 
     def update(self):
-
         for event in pygame.event.get():
+            self.caixaTexto.escreve(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
@@ -36,95 +39,77 @@ class TelaInicial():
         return True
     def troca_tela(self):
         if self.play:
-            return TelaJogo(self.tela)
+            return TelaJogo(self.tela, self.caixaTexto.texto)
         elif self.ranking:
-            return TelaRanking(self.tela)
+            return TelaInicial(self.tela)
         else:
             return self
         
 class TelaJogo:
-    def __init__(self, tela):
-        self.blocos = []
-        self.barcos = []
-        self.gerarBlocos(self.generateGrid())
+    def __init__(self, tela, nome):
         self.frame = 0
         self.tela = tela
+        self.y = 0
         self.clock = pygame.time.Clock()
         self.player = Player()
-
-    def gerarBlocos(self, grid): # Gerar todos os blocos que vão ocupar a tela
-        y = 800
-        for row in grid:
-            centro = 25
-            for block in row:
-                if block == 'agua' and random.randint(0, 2) == 0: # 1/3 de chance de gerar um barco, por bloco de agua
-                    barco = sprites['barco'].get_rect()
-                    barco.centerx = centro
-                    barco.bottom = y
-                    self.barcos.append(barco)
-                bloco = sprites[block].get_rect()
-                bloco.centerx = centro
-                bloco.bottom = y
-                centro += 50
-                self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
-            centro = 25
-            y -= 50
-
-    def generateGrid(self):
-        grid = []
-        for _ in range(16):
-            tile = random.choice(['grama', 'agua', 'trilho'])
-            grid.append([tile] * 10)
-        return grid
-    
-    def updateBlocos(self):
-        for i in self.blocos:
-            i[1].bottom += 1
-        for barco in self.barcos:
-            barco.centerx -= 1
-            barco.bottom += 1
-            if barco.centerx < -50:
-                barco.centerx = 550
-            if barco.bottom > 800:
-                self.barcos.remove(barco)
-        if self.frame == 0: # Gerar uma nova fileira em cima
-            self.nova_fileira()
-            self.frame = -50
-        self.frame += 1 
-
-    def nova_fileira(self):
-        block = random.choice(['grama', 'agua', 'trilho'])
+        self.fonte  = pygame.font.Font(None, 36)
+        self.dificuldade = 0
+        self.nome = nome
+        for i in range(17):
+            self.nova_fileira(y=800-(i*50))
+    def nova_fileira(self, y=0):
+        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama'])
+        if self.dificuldade > 0:
+            block = random.choice(['trilho', 'agua', 'trilho', 'grama', 'trilho', 'grama'])
+        if y > 500 and y <850:
+            block = 'grama'
+        direcao = random.choice([1, -1])
+        speed = random.randint(2+self.dificuldade, 3+self.dificuldade)
+        temBarco = False
         for i in range(10):
-            if block == 'agua' and random.randint(0, 2) == 0: # 1/3 de chance de gerar um barco, por bloco de agua
-                barco = sprites['barco'].get_rect()
-                barco.centerx = i * 50 + 25
-                barco.bottom = 0
-                self.barcos.append(barco)
-            bloco = sprites[block].get_rect()
-            bloco.centerx = i * 50 + 25
-            bloco.bottom = 0
-            self.blocos.append((sprites[block], bloco, block)) # (imagem, rect, tipo)
-    
+            if block == 'grama':Grama(i * 50 + 25, y, self.player)
+            elif block == 'agua':Agua(i * 50 + 25, y, self.player)
+            elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
+            if block == 'agua' and random.randint(0, 2+self.dificuldade) == 0:
+                Barco(i * 50 + 25, y, self.player, speed, direcao)
+                temBarco = True
+            elif not temBarco and i == 9 and block == 'agua':
+                Barco(i * 50 + 25, y, self.player, speed, direcao)
+            if block == 'trilho' and random.randint(0, 4-self.dificuldade) == 0:Minecart(i * 50 + 25, y, self.player, speed*2 -1, direcao)
+    def salvar_highscore(self):
+        string = '\n'+self.nome+','+str(self.player.score)
+        with open('scores.csv', 'a') as f:
+            f.write(string)
+            print(string)
     def update(self):
+        if self.y == 25: # Gerar uma nova fileira em cima
+            self.nova_fileira()
+            self.y = 0
+        self.y += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-        self.updateBlocos()
         self.player.update()
         self.clock.tick(30)
+        if self.player.score > 40:
+            self.dificuldade = 2
         return True
     
     def desenha(self):
-        for i in self.blocos:
-            self.tela.blit(i[0], i[1])
-        for i in self.barcos:
-            self.tela.blit(sprites['barco'], (i[0], i[1]))
+        self.tela.fill((255, 255, 255))
+        for i in self.player.blocos:
+            self.tela.blit(i.image, i.rect)
+        for i in self.player.obstaculos:
+            self.tela.blit(i.image, i.rect)
         self.tela.blit(self.player.image, self.player.rect)
+        t = "pontuacao: " + str(self.player.score)
+        texto = self.fonte.render(t, True, (255, 255, 255))
+        self.tela.blit(texto, (300, 10))
         pygame.display.update()
     
     def troca_tela(self):
-        if self.player.checarMorte(self.blocos, self.barcos):
-            print('morreu')
+        if self.player.checarMorte():
+            self.salvar_highscore()
             return TelaInicial(self.tela)
         else:
             return self

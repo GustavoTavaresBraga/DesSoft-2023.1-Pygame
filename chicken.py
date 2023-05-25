@@ -1,5 +1,6 @@
 import pygame
-
+import random
+from sprites import sprites
 class Player():
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -10,53 +11,178 @@ class Player():
         self.movimento = None
         self.moveu = 0
         self.noBarco = False
-
+        self.blocos = []
+        self.speedBoat = 0
+        self.score = 0
+        self.obstaculos = []
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movimento is None: self.movimento = 'cima'
-        if keys[pygame.K_DOWN] and self.movimento is None: self.movimento = 'baixo'
-        if keys[pygame.K_LEFT] and self.movimento is None: self.movimento = 'esquerda'
-        if keys[pygame.K_RIGHT] and self.movimento is None: self.movimento = 'direita'
-
-        self.rect.bottom += 1 # Mexer a galinha pra baixo
+        if keys[pygame.K_DOWN] and self.movimento is None and self.rect.bottom <= 750: self.movimento = 'baixo'
+        if keys[pygame.K_LEFT] and self.movimento is None and self.rect.centerx >= 50: self.movimento = 'esquerda'
+        if keys[pygame.K_RIGHT] and self.movimento is None and self.rect.centerx <= 450: self.movimento = 'direita'
+       
         if self.noBarco:
-            self.rect.centerx -= 1
+            self.rect.centerx += self.speedBoat
+            if self.rect.centerx < -50:
+                self.rect.centerx = 550
+            if self.rect.centerx > 550:
+                self.rect.centerx = -50
         if self.movimento == 'cima':
-            self.rect.y -= 2
+            self.rect.y -= 10
             self.moveu +=1
-            if self.moveu == 25:
+            if self.moveu == 5:
                 self.movimento = None
                 self.moveu = 0
+                self.score += 1
 
         if self.movimento == 'baixo':
-            self.rect.y += 2
+            self.rect.y += 10
             self.moveu +=1
-            if self.moveu == 25:
+            if self.moveu == 5:
                 self.movimento = None
                 self.moveu = 0
+                self.score -= 1
         if self.movimento == 'esquerda':
-            self.rect.x -= 2
+            self.rect.x -= 10
             self.moveu +=1
-            if self.moveu == 25:
+            if self.moveu == 5:
                 self.movimento = None
                 self.moveu = 0
 
         if self.movimento == 'direita':
-            self.rect.x += 2
+            self.rect.x += 10
             self.moveu +=1
-            if self.moveu == 25:
+            if self.moveu > 5:
                 self.movimento = None
                 self.moveu = 0
-
         #conferir estado
-        
-    def checarMorte(self, blocos, barcos):
+        for i in self.blocos:
+            if i.rect.bottom > 850:
+                self.blocos.remove(i)
+            i.update()
+        for i in self.obstaculos:
+            if i.rect.bottom > 850:
+                self.obstaculos.remove(i)
+            i.update()
+        self.rect.bottom += 2 # Mexer a galinha pra baixo
+    def checarMorte(self):
+        if self.rect.bottom > 840:
+            return True
         self.noBarco = False
-        for i in blocos:
-            if i[2] == 'agua' and self.rect.colliderect(i[1]):
-                for barco in barcos:
-                    if abs(self.rect.centerx - barco.centerx) < 50 and abs(self.rect.bottom - barco.bottom) < 50:
-                        self.noBarco = True
+        for i in self.obstaculos:
+            if i.rect.colliderect(self.rect) and (i.tipo == 'minecart' or i.tipo == 'zumbi'):
+                return True
+            if i.rect.colliderect(self.rect) and i.tipo == 'barco':
+                self.noBarco = True
+                self.speedBoat = i.speedX
+        for i in self.blocos:
+            if i.rect.colliderect(self.rect) and i.tipo == 'agua':
                 if not self.noBarco:
                     return True
         return False
+
+class Minecart():
+    def __init__(self, x, y, player, speed, direcao):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sprites['minecart']
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.direcao = direcao
+        self.rect.bottom = y
+        self.tipo = 'minecart'
+        self.speedX = speed*direcao
+        player.obstaculos.append(self)
+    def update(self, velocidade = 2):
+        self.rect.bottom += velocidade # 
+        self.rect.centerx += self.speedX
+        if self.rect.centerx < -50 and self.direcao == -1:
+            self.rect.centerx = 550
+        elif self.rect.centerx > 550 and self.direcao == 1:
+            self.rect.centerx = -50
+class Barco():
+    def __init__(self, x, y, player, speed, direcao):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sprites['barco']
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.tipo = 'barco'
+        self.direcao = direcao
+        self.speedX = speed*direcao
+        player.obstaculos.append(self)
+    def update(self, velocidade = 2):
+        self.rect.bottom += velocidade # 
+        self.rect.centerx += self.speedX
+        if self.rect.centerx < -50 and self.direcao == -1:
+            self.rect.centerx = 550
+        elif self.rect.centerx > 550 and self.direcao == 1:
+            self.rect.centerx = -50
+class Agua():
+    def __init__(self, x, y, player):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sprites['agua']
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.tipo = 'agua'
+        player.blocos.append(self)
+    def update(self, velocidade = 2):
+        self.rect.bottom += velocidade # 
+class Grama():
+    def __init__(self, x, y, player):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sprites['grama']
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.tipo = 'grama'
+        player.blocos.append(self)
+    def update(self, velocidade = 2):
+        self.rect.bottom += velocidade # 
+class Trilho():
+    def __init__(self, x, y, player):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = sprites['trilho']
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.tipo = 'trilho'
+        player.blocos.append(self)
+    def update(self, velocidade = 2):
+        self.rect.bottom += velocidade # 
+class CaixaTexto():
+    def __init__ (self, fonte, tela):
+        self.rect = pygame.Rect(140, 510, 430 , 35)
+        self.texto = 'escreva seu nome'
+        self.texto_surface = fonte.render(self.texto, True, (211, 211, 211))
+        self.pode_escrever = False
+        self.fonte = fonte
+        self.cor = 'Yellow'
+        self.tela = tela
+        self.nome = ''
+    
+    def escreve(self, event): 
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            #Muda cor caso clicado
+            if  self.rect.collidepoint(event.pos):
+                self.pode_escrever = True
+                self.texto = ''
+                self.rect.x = 250
+                self.texto_surface = self.fonte.render(self.texto, True, (211, 211, 211))
+            else:
+                self.pode_escrever = False
+        #Salva o texto
+        if event.type == pygame.KEYDOWN and self.pode_escrever:
+            if event.key == pygame.K_BACKSPACE:
+                self.texto = self.texto[:-1]
+                self.rect.width -= 20
+                self.rect.x += 7
+            #Aumenta o tamanho
+            else:
+                self.texto += event.unicode #https://www.pygame.org/docs/ref/event.html
+                self.rect.width += 20
+                self.rect.x -= 7
+            self.texto_surface = self.fonte.render(self.texto, True, (211, 211, 211))
+    def desenha(self):
+        self.tela.blit(self.texto_surface, (self.rect.x + 5, self.rect.y + 5))
