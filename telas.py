@@ -154,3 +154,37 @@ class TelaRanking():
             return TelaInicial(self.tela)
         else:
             return self
+class TelaOptions():
+    def _init_(self, tela):
+        self.tela = tela
+        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
+        self.fonte2  = pygame.font.Font('MinecraftTen-VGORe.ttf', 45)
+        self.botaoSair = pygame.Rect(0, 0, 100, 50)
+        self.botaoJogar = pygame.Rect(0,495, 150, 50)
+        self.botaoJogar.centerx = 250
+        self.voltar = False
+        self.play = False
+    def desenha(self):
+        self.tela.fill((0, 0, 0))
+        texto1 = self.fonte.render('voltar', True, (255, 255, 255))
+        texto2 = self.fonte2.render('Jogar', True, (255, 255, 255))
+        self.tela.blit(texto1, (0,0))
+        self.tela.blit(texto2, (185, 500))
+        pygame.display.update()
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
+                self.voltar = True
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoJogar.collidepoint(event.pos):
+                self.play = True # Left mouse button click
+        return True
+    def troca_tela(self):
+        if self.voltar:
+            return TelaInicial(self.tela)
+        elif self.play:
+            return TelaJogo(self.tela)
+        else:
+            return self
