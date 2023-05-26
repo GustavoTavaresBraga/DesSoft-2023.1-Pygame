@@ -2,7 +2,7 @@ import pygame
 import random
 from sprites import sprites
 class Player():
-    def __init__(self):
+    def __init__(self, velocidade = 2, vidas = 1):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
         self.rect = pygame.Rect(0, 0, 40, 40)
@@ -12,9 +12,12 @@ class Player():
         self.moveu = 0
         self.noBarco = False
         self.blocos = []
+        self.vidas = vidas
         self.speedBoat = 0
         self.score = 0
         self.obstaculos = []
+        self.velocidade = velocidade
+        self.imunidade = 0
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movimento is None: self.movimento = 'cima'
@@ -60,26 +63,33 @@ class Player():
         for i in self.blocos:
             if i.rect.bottom > 850:
                 self.blocos.remove(i)
-            i.update()
+            i.update(self.velocidade)
         for i in self.obstaculos:
             if i.rect.bottom > 850:
                 self.obstaculos.remove(i)
-            i.update()
-        self.rect.bottom += 2 # Mexer a galinha pra baixo
+            i.update(self.velocidade)
+        self.imunidade -= 1
+        self.rect.bottom += self.velocidade # Mexer a galinha pra baixo
+        print(self.imunidade)
     def checarMorte(self):
-        if self.rect.bottom > 840:
-            return True
-        self.noBarco = False
-        for i in self.obstaculos:
-            if i.rect.colliderect(self.rect) and i.tipo == 'minecart':
+        if self.imunidade <= 0:
+            if self.rect.bottom > 840:
                 return True
-            if i.rect.colliderect(self.rect) and i.tipo == 'barco':
-                self.noBarco = True
-                self.speedBoat = i.speedX
-        for i in self.blocos:
-            if i.rect.colliderect(self.rect) and i.tipo == 'agua':
-                if not self.noBarco:
-                    return True
+            self.noBarco = False
+            for i in self.obstaculos:
+                if i.rect.colliderect(self.rect) and i.tipo == 'minecart':
+                    self.vidas -= 1
+                    self.imunidade = 50
+                if i.rect.colliderect(self.rect) and i.tipo == 'barco':
+                    self.noBarco = True
+                    self.speedBoat = i.speedX
+            for i in self.blocos:
+                if i.rect.colliderect(self.rect) and i.tipo == 'agua':
+                    if not self.noBarco:
+                        self.vidas -= 1
+                        self.imunidade = 50
+            if self.vidas <= 0:
+                return True
         return False
 
 class Minecart():
