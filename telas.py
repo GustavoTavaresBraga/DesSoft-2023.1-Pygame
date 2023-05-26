@@ -123,6 +123,7 @@ class TelaRanking():
     def __init__(self, tela):
         self.ranking = {}
         self.tela = tela
+        self.fundo = pygame.transform.scale((pygame.image.load('sprites/Ranking.png').convert_alpha()), (500, 800))
         with open('scores.csv', 'r') as scores:
             for line in scores:
                 nome, score = line.split(',')
@@ -133,6 +134,7 @@ class TelaRanking():
         self.voltar = False
     def desenha(self):
         self.tela.fill((0, 0, 0))
+        self.tela.blit(self.fundo, (0,0))
         texto1 = self.fonte.render('voltar', True, (255, 255, 255))
         self.tela.blit(texto1, (0, 0))
         for i in range(len(self.ranking)):
