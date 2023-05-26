@@ -159,17 +159,38 @@ class TelaOptions():
         self.tela = tela
         self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
         self.fonte2  = pygame.font.Font('MinecraftTen-VGORe.ttf', 45)
+        self.fundo = pygame.transform.scale((pygame.image.load('sprites/grama.png').convert_alpha()), (500, 200))
+        self.fundo2 = pygame.transform.scale((pygame.image.load('sprites/agua.png').convert_alpha()), (500, 200))
+        self.fundo3 = pygame.transform.scale((pygame.image.load('sprites/trilho.png').convert_alpha()), (500, 200))
         self.botaoSair = pygame.Rect(0, 0, 100, 50)
-        self.botaoJogar = pygame.Rect(0,495, 150, 50)
+        self.botaoJogar = pygame.Rect(0,650, 150, 50)
+        self.botaoVelocidade = pygame.Rect(120,200, 190, 50)
+        self.BotaoVolume = pygame.Rect(130, 350, 190, 50)
+        self.BotaoEfeitos = pygame.Rect(10, 500, 500, 50)
         self.botaoJogar.centerx = 250
+        self.Volume = 'On'
+        self.Efeitos = 'On'
+        self.velocidade = 1
         self.voltar = False
         self.play = False
     def desenha(self):
-        self.tela.fill((0, 0, 0))
+        self.tela.fill((0,0,0))
+        self.tela.blit(self.fundo,(0,0))
+        self.tela.blit(self.fundo2,(0,200))
+        self.tela.blit(self.fundo3,(0,400))
+        self.tela.blit(self.fundo2,(0,600))
         texto1 = self.fonte.render('voltar', True, (255, 255, 255))
         texto2 = self.fonte2.render('Jogar', True, (255, 255, 255))
+        texto3 = self.fonte2.render('Velocidade: {}'.format(self.velocidade), True, (255, 255, 255))
+        texto4 = self.fonte2.render('Musica: {}'.format(self.Volume), True, (255, 255, 255))
+        texto5 = self.fonte2.render('Settings:', True, (255, 255, 255))
+        texto6 = self.fonte2.render('Efeitos especiais: {}'.format(self.Efeitos), True, (255, 255, 255))
         self.tela.blit(texto1, (0,0))
-        self.tela.blit(texto2, (185, 500))
+        self.tela.blit(texto2, (185, 650))
+        self.tela.blit(texto3, (120, 200))
+        self.tela.blit(texto4, (130, 350))
+        self.tela.blit(texto5, (155, 50))
+        self.tela.blit(texto6, (10, 500))
         pygame.display.update()
     def update(self):
         for event in pygame.event.get():
@@ -180,6 +201,20 @@ class TelaOptions():
                 self.voltar = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoJogar.collidepoint(event.pos):
                 self.play = True # Left mouse button click
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoVelocidade.collidepoint(event.pos):
+                self.velocidade += 1
+                if self.velocidade > 3:
+                    self.velocidade = 1
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.BotaoVolume.collidepoint(event.pos):
+                if self.Volume == 'On':
+                    self.Volume = 'Off'
+                else:
+                    self.Volume = 'On'
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.BotaoEfeitos.collidepoint(event.pos):
+                if self.Efeitos == 'On':
+                    self.Efeitos = 'Off'
+                else:
+                    self.Efeitos = 'On'
         return True
     def troca_tela(self):
         if self.voltar:
