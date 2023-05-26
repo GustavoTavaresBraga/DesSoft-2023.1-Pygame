@@ -54,14 +54,13 @@ class TelaJogo:
     def __init__(self, tela, nome='',opcoes= None):
         self.opcoes = opcoes
         if self.opcoes == None: 
-            self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
+            self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
         self.frame = 0
         self.tela = tela
         self.y = 0
         self.clock = pygame.time.Clock()
         self.player = Player(self.opcoes['Velocidade'], self.opcoes['Vidas'])
         self.fonte  = pygame.font.Font(None, 36)
-        self.dificuldade = 0
         self.nome = nome
         self.velocidade = self.opcoes['Velocidade']
         print(self.velocidade)
@@ -69,25 +68,25 @@ class TelaJogo:
             self.nova_fileira(y=800-(i*50))
     def nova_fileira(self, y=0):
         block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama'])
-        if self.dificuldade > 0:
-            block = random.choice(['trilho', 'agua', 'trilho', 'grama', 'trilho', 'grama'])
         if y > 500 and y <850:
             block = 'grama'
         direcao = random.choice([1, -1])
-        speed = random.randint(2+self.dificuldade, 3+self.dificuldade)
+        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
+        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3)
+
         temBarco = False
         for i in range(10):
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
             elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
-            if block == 'agua' and random.randint(0, 2+self.dificuldade) == 0:
-                Barco(i * 50 + 25, y, self.player, speed, direcao)
+            if block == 'agua' and random.randint(0, (10-self.opcoes['NBarcos'])) == 0:
+                Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
                 temBarco = True
             elif not temBarco and i == 9 and block == 'agua':
-                Barco(i * 50 + 25, y, self.player, speed, direcao)
-            if block == 'trilho' and random.randint(0, 4-self.dificuldade) == 0:Minecart(i * 50 + 25, y, self.player, speed*2 -1, direcao)
+                Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
+            if block == 'trilho' and random.randint(0, (10-self.opcoes['NMinecarts'])) == 0:Minecart(i * 50 + 25, y, self.player, speedcart, direcao)
     def salvar_highscore(self):
-        if self.nome == '' and self.nome != 'digite seu nome':
+        if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.player.score)
             with open('scores.csv', 'a') as f:
                 f.write(string)
@@ -102,8 +101,6 @@ class TelaJogo:
                 return False
         self.player.update()
         self.clock.tick(30)
-        if self.player.score > 40:
-            self.dificuldade = 2
         return True
     
     def desenha(self):
@@ -189,7 +186,7 @@ class TelaOptions():
                 for name in self.botoes.keys():
                     if self.botoes[name].collidepoint(event.pos):
                         if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
-                            self.opcoes[name[5:]] = self.opcoes[name[5:]] % 10 + 1
+                            self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1
                         elif name in ['botaoMusica', 'botaoEfeitos']:
                             self.opcoes[name[5:]] = not self.opcoes[name[5:]]
                         elif name == 'botaoVoltar': self.voltar = True
