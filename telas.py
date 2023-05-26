@@ -46,12 +46,12 @@ class TelaInicial():
         elif self.ranking:
             return TelaRanking(self.tela)
         elif self.options:
-            return self
+            return TelaOptions(self.tela)
         else:
             return self
         
 class TelaJogo:
-    def __init__(self, tela, nome):
+    def __init__(self, tela, nome=''):
         self.frame = 0
         self.tela = tela
         self.y = 0
@@ -155,7 +155,7 @@ class TelaRanking():
         else:
             return self
 class TelaOptions():
-    def _init_(self, tela):
+    def __init__(self, tela):
         self.tela = tela
         self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
         self.fonte2  = pygame.font.Font('MinecraftTen-VGORe.ttf', 45)
