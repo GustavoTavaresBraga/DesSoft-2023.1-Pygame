@@ -1,6 +1,6 @@
 import pygame
 import random
-from sprites import sprites, click_som, toggle_som
+from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *
 global jogador
 class TelaInicial():
@@ -32,13 +32,13 @@ class TelaInicial():
                 mouse_x, mouse_y = event.pos
                 if self.botaoPlay.collidepoint(mouse_x, mouse_y):
                     self.play = True
-                    click_som.play()
+                    efeitos_sonoros['click_som'].play()
                 elif self.botaoRanking.collidepoint(mouse_x, mouse_y):
                     self.ranking = True
-                    click_som.play()
+                    efeitos_sonoros['click_som'].play()
                 elif self.botaoOptions.collidepoint(mouse_x, mouse_y):
-                    self.options = True
-                    click_som.play()
+                    self.options = True 
+                    efeitos_sonoros['click_som'].play()
                 elif self.botaoSair.collidepoint(mouse_x, mouse_y):
                     pygame.quit()
                     return False
@@ -120,6 +120,7 @@ class TelaJogo:
     
     def troca_tela(self):
         if self.player.checarMorte():
+            efeitos_sonoros['morte_som'].play()
             self.salvar_highscore()
             return TelaInicial(self.tela)
         else:
@@ -155,7 +156,7 @@ class TelaRanking():
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
                 self.voltar = True
-                click_som.play()
+                efeitos_sonoros['click_som'].play()
         return True
     def troca_tela(self):
         if self.voltar:
@@ -190,14 +191,17 @@ class TelaOptions():
                 for name in self.botoes.keys():
                     if self.botoes[name].collidepoint(event.pos):
                         if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
-                            click_som.play()
+                            efeitos_sonoros['click_som'].play()
                             self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1
-                        elif name in ['botaoMusica', 'botaoEfeitos']:
+                        elif name == 'botaoEfeitos':
                             toggle_som()
-                            click_som.play()
+                            efeitos_sonoros['click_som'].play()
+                        elif name == 'botaoMusica':
+                            efeitos_sonoros['click_som'].play()
+                            pygame.mixer.music.pause() if pygame.mixer.music.get_busy() else pygame.mixer.music.unpause()
                             
-                        elif name == 'botaoVoltar': self.voltar = True, click_som.play()
-                        elif name == 'botaoJogar': self.play = True, click_som.play()
+                        elif name == 'botaoVoltar': self.voltar = True, efeitos_sonoros['click_som'].play()
+                        elif name == 'botaoJogar': self.play = True, efeitos_sonoros['click_som'].play()
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.voltar = True
         return True

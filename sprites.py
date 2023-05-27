@@ -21,11 +21,12 @@ sprites = {
     'botaoVoltar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVoltar.png'), (200, 40)),
     'botaoJogar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoJogar.png'), (200, 40)),
 }
-efeitos_sonoros = []
-click_som = pygame.mixer.Sound('assets/click.mp3')
-efeitos_sonoros.append(click_som)
+efeitos_sonoros = {
+    'morte_som':pygame.mixer.Sound('assets/morte.mp3'),
+    'click_som':pygame.mixer.Sound('assets/click.mp3')
+}
 def toggle_som():
-    for som in efeitos_sonoros:
+    for som in efeitos_sonoros.values():
         if som.get_volume() == 0:
             som.set_volume(1)
         else:
