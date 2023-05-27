@@ -1,6 +1,6 @@
 import pygame
 from telas import TelaInicial
-
+global musica, efeitos
 
 def inicializa():
     """Função que inicializa o jogo e carrega os assets

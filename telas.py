@@ -1,12 +1,12 @@
 import pygame
 import random
-from sprites import sprites
+from sprites import sprites, click_som, toggle_som
 from chicken import *
 global jogador
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
-        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
+        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
         self.fundo = sprites['inicio']
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
@@ -32,10 +32,13 @@ class TelaInicial():
                 mouse_x, mouse_y = event.pos
                 if self.botaoPlay.collidepoint(mouse_x, mouse_y):
                     self.play = True
+                    click_som.play()
                 elif self.botaoRanking.collidepoint(mouse_x, mouse_y):
                     self.ranking = True
+                    click_som.play()
                 elif self.botaoOptions.collidepoint(mouse_x, mouse_y):
                     self.options = True
+                    click_som.play()
                 elif self.botaoSair.collidepoint(mouse_x, mouse_y):
                     pygame.quit()
                     return False
@@ -88,7 +91,7 @@ class TelaJogo:
     def salvar_highscore(self):
         if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.player.score)
-            with open('scores.csv', 'a') as f:
+            with open('assets/scores.csv', 'a') as f:
                 f.write(string)
                 print(string)
     def update(self):
@@ -125,13 +128,13 @@ class TelaRanking():
     def __init__(self, tela):
         self.ranking = {}
         self.tela = tela
-        self.fundo = pygame.transform.scale((pygame.image.load('sprites/Ranking.png').convert_alpha()), (500, 800))
-        with open('scores.csv', 'r') as scores:
+        self.fundo = sprites['ranking']
+        with open('assets/scores.csv', 'r') as scores:
             for line in scores:
                 nome, score = line.split(',')
                 self.ranking[nome] = int(score)
         self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True)
-        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
+        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
         self.botaoSair = pygame.Rect(0, 0, 100, 50)
         self.voltar = False
     def desenha(self):
@@ -152,6 +155,7 @@ class TelaRanking():
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
                 self.voltar = True
+                click_som.play()
         return True
     def troca_tela(self):
         if self.voltar:
@@ -160,7 +164,7 @@ class TelaRanking():
             return self
 class TelaOptions():
     def __init__(self, tela):
-        self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('MinecraftTen-VGORe.ttf', 30), False, False
+        self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30), False, False
         self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaoVelocidade', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
         self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
 
@@ -186,11 +190,14 @@ class TelaOptions():
                 for name in self.botoes.keys():
                     if self.botoes[name].collidepoint(event.pos):
                         if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
+                            click_som.play()
                             self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1
                         elif name in ['botaoMusica', 'botaoEfeitos']:
-                            self.opcoes[name[5:]] = not self.opcoes[name[5:]]
-                        elif name == 'botaoVoltar': self.voltar = True
-                        elif name == 'botaoJogar': self.play = True
+                            toggle_som()
+                            click_som.play()
+                            
+                        elif name == 'botaoVoltar': self.voltar = True, click_som.play()
+                        elif name == 'botaoJogar': self.play = True, click_som.play()
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.voltar = True
         return True
