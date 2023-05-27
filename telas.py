@@ -6,7 +6,7 @@ global jogador
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
-        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
+        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
         self.fundo = sprites['inicio']
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
@@ -88,7 +88,7 @@ class TelaJogo:
     def salvar_highscore(self):
         if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.player.score)
-            with open('assets/scores.csv', 'a') as f:
+            with open('scores.csv', 'a') as f:
                 f.write(string)
                 print(string)
     def update(self):
@@ -125,13 +125,13 @@ class TelaRanking():
     def __init__(self, tela):
         self.ranking = {}
         self.tela = tela
-        self.fundo = sprites['ranking']
-        with open('assets/scores.csv', 'r') as scores:
+        self.fundo = pygame.transform.scale((pygame.image.load('sprites/Ranking.png').convert_alpha()), (500, 800))
+        with open('scores.csv', 'r') as scores:
             for line in scores:
                 nome, score = line.split(',')
                 self.ranking[nome] = int(score)
         self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True)
-        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
+        self.fonte  = pygame.font.Font('MinecraftTen-VGORe.ttf', 30)
         self.botaoSair = pygame.Rect(0, 0, 100, 50)
         self.voltar = False
     def desenha(self):
@@ -160,7 +160,7 @@ class TelaRanking():
             return self
 class TelaOptions():
     def __init__(self, tela):
-        self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30), False, False
+        self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('MinecraftTen-VGORe.ttf', 30), False, False
         self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaoVelocidade', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
         self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
 
