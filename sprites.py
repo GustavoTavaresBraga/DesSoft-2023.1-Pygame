@@ -22,10 +22,12 @@ sprites = {
     'botaoJogar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoJogar.png'), (200, 40)),
 }
 efeitos_sonoros = {
-    'morte_som':pygame.mixer.Sound('assets/morte.mp3'),
-    'click_som':pygame.mixer.Sound('assets/click.mp3')
+    'click_som':pygame.mixer.Sound('assets/click.ogg'),
+    'morte_som':pygame.mixer.Sound('assets/morte.ogg'),
+    'minecart_som':pygame.mixer.Sound('assets/Minecart.ogg')
 }
-def toggle_som():
+efeitos_sonoros['minecart_som'].set_volume(0.5)
+def toggle_som():   
     for som in efeitos_sonoros.values():
         if som.get_volume() == 0:
             som.set_volume(1)

@@ -12,8 +12,8 @@ def inicializa():
     pygame.display.set_caption('Crossy Chicken')
     musica = random.choice(['assets/sweden.mp3', 'assets/AriaMath.mp3'])
     pygame.mixer_music.load(musica)
-    pygame.mixer_music.set_volume(0.4)
-    pygame.mixer_music.play()
+    pygame.mixer_music.set_volume(0.6)
+    pygame.mixer_music.play(-1)
     return tela
 
 def game_loop():
@@ -25,5 +25,4 @@ def game_loop():
     while tela_atual.update(): 
         tela_atual = tela_atual.troca_tela()
         tela_atual.desenha()
-        
 game_loop()

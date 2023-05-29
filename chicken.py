@@ -1,6 +1,6 @@
 import pygame
 import random
-from sprites import sprites
+from sprites import sprites, efeitos_sonoros
 class Player():
     def __init__(self, velocidade = 2, vidas = 1):
         pygame.sprite.Sprite.__init__(self)
@@ -72,14 +72,19 @@ class Player():
         self.rect.bottom += self.velocidade # Mexer a galinha pra baixo
         print(self.imunidade)
     def checarMorte(self):
+        if self.vidas <= 0:
+                return True
         if self.imunidade <= 0:
             if self.rect.bottom > 840:
+                efeitos_sonoros['morte_som'].play()
                 return True
             self.noBarco = False
             for i in self.obstaculos:
                 if i.rect.colliderect(self.rect) and i.tipo == 'minecart':
                     self.vidas -= 1
+                    efeitos_sonoros['morte_som'].play()
                     self.imunidade = 50
+                    return False
                 if i.rect.colliderect(self.rect) and i.tipo == 'barco':
                     self.noBarco = True
                     self.speedBoat = i.speedX
@@ -87,9 +92,9 @@ class Player():
                 if i.rect.colliderect(self.rect) and i.tipo == 'agua':
                     if not self.noBarco:
                         self.vidas -= 1
+                        efeitos_sonoros['morte_som'].play()
                         self.imunidade = 50
-            if self.vidas <= 0:
-                return True
+                        return False
         return False
 
 class Minecart():
@@ -108,6 +113,9 @@ class Minecart():
         self.rect.centerx += self.speedX
         if self.rect.centerx < -50 and self.direcao == -1:
             self.rect.centerx = 550
+            efeitos_sonoros['minecart_som'].play()
+            efeitos_sonoros['minecart_som'].set_volume(0.1)
+            efeitos_sonoros['minecart_som'].fadeout(4000)
         elif self.rect.centerx > 550 and self.direcao == 1:
             self.rect.centerx = -50
 class Barco():
