@@ -1,4 +1,5 @@
 import pygame
+import textwrap
 import random
 from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *
@@ -6,20 +7,24 @@ global jogador
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
-        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
+        self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
         self.fundo = sprites['inicio']
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
         self.botaoSair = pygame.Rect(275, 585, 210, 40)
         self.botaoOptions = pygame.Rect(55, 585, 210, 40)
+        self.botaoTutorial = pygame.Rect(5,585, 40, 42 )
         self.play = False
         self.options = False
         self.ranking = False
+        self.tutorial = False
         self.caixaTexto = CaixaTexto(self.fonte, tela)
     def desenha(self):
+        
         self.tela.fill((255, 255, 255))
         self.tela.blit(self.fundo, (0, 0))
         self.caixaTexto.desenha()
+        pygame.draw.rect(self.tela, "white", self.botaoTutorial , 5)
         pygame.display.update()
 
     def update(self):
@@ -39,6 +44,9 @@ class TelaInicial():
                 elif self.botaoOptions.collidepoint(mouse_x, mouse_y):
                     self.options = True 
                     efeitos_sonoros['click_som'].play()
+                elif self.botaoTutorial.collidepoint(mouse_x, mouse_y):
+                    self.tutorial = True
+                    efeitos_sonoros['click_som'].play()
                 elif self.botaoSair.collidepoint(mouse_x, mouse_y):
                     pygame.quit()
                     return False
@@ -50,6 +58,8 @@ class TelaInicial():
             return TelaRanking(self.tela)
         elif self.options:
             return TelaOptions(self.tela)
+        elif self.tutorial:
+            return TelaTutorial(self.tela)
         else:
             return self
         
@@ -210,5 +220,47 @@ class TelaOptions():
             return TelaInicial(self.tela)
         elif self.play:
             return TelaJogo(self.tela, opcoes = self.opcoes)
+        else:
+            return self
+        
+class TelaTutorial():
+    def __init__(self, tela):
+        self.tela = tela
+        self.fundo = sprites['ranking']
+        self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
+        self.botaoSair = pygame.Rect(200, 700, 105, 25)
+        self.voltar = False
+    
+    def desenha(self):
+        self.tela.blit(self.fundo, (0,0))
+        texto1 = self.fonte.render('voltar', True, (255, 255, 255))
+        self.tela.blit(texto1, (200, 700))
+        font = pygame.font.SysFont(None, 60)
+        font2 = pygame.font.SysFont(None, 30)
+        text = font.render('TUTORIAL', True, (255, 255, 255))
+        texto = 'Para jogar serão utilizadas as setas do teclado para movimentar para frente, para trás, para a direita e para a esquerda. Sua missão é atravessar o mapa sem ser atingido pelos carrinhos de mineração e sem cair nos rios. Vão ter barcos para te ajudar na travessia dos rios. Quanto mais longe chegar, mais pontuará. Aproveite o jogo!'
+        text2 = font2.render(texto, True, (255, 255, 255))
+        self.tela.blit(text, (10, 10))
+        self.tela.blit(text2, (10, 100))
+        pygame.draw.rect(self.tela, "white", self.botaoSair , 5)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+        pygame.display.update()
+
+    def update(self):
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
+                self.voltar = True
+                efeitos_sonoros['click_som'].play()
+        return True
+    def troca_tela(self):
+        if self.voltar:
+            return TelaInicial(self.tela)
         else:
             return self
