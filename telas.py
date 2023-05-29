@@ -130,7 +130,6 @@ class TelaJogo:
     
     def troca_tela(self):
         if self.player.checarMorte():
-            efeitos_sonoros['morte_som'].play()
             self.salvar_highscore()
             return TelaInicial(self.tela)
         else:
