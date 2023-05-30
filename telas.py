@@ -198,8 +198,11 @@ class TelaRanking():
             return TelaInicial(self.tela)
         else:
             return self
+        
+# criando classe da tela de opções
 class TelaOptions():
     def __init__(self, tela):
+        #criando os botoes 
         self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30), False, False
         self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaoVelocidade', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
         self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
@@ -208,10 +211,11 @@ class TelaOptions():
         for x, y, name in [(250, 300, 'botaoNBarcos'), (250, 350, 'botaoNMinecarts'), (250, 250, 'botaoVelocidade'), (150, 500, 'botaoEfeitos'), (350, 500, 'botaoMusica'), (250, 400, 'botaoVB'), (250, 450, 'botaoVM'), (400, 640, 'botaoVoltar'), (250, 130, 'botaoJogar'), (250, 200, 'botaoVidas')]:
             for n in (name if isinstance(name, list) else [name]):
                 self.botoes[n].centerx, self.botoes[n].centery = x, y
+
     def desenha(self):
-        self.tela.fill((0,0,0))
-        self.tela.blit(self.fundo, (0,0))
-        [self.tela.blit(sprites[name], self.botoes[name]) for name in self.botoes.keys()]
+        self.tela.fill((0,0,0)) 
+        self.tela.blit(self.fundo, (0,0))   #colocando imgaem de fundo
+        [self.tela.blit(sprites[name], self.botoes[name]) for name in self.botoes.keys()]   #colocando os botões
         for i in range(6):
             texto = self.fonte.render(str(list(self.opcoes.values())[i]), True, (210, 210, 210))
             self.tela.blit(texto, (400, 187+i*50))
@@ -227,11 +231,11 @@ class TelaOptions():
                     if self.botoes[name].collidepoint(event.pos):
                         if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
                             efeitos_sonoros['click_som'].play()
-                            self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1
-                        elif name == 'botaoEfeitos':
+                            self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1   #aumentando a quantidade de cada categoria de opção
+                        elif name == 'botaoEfeitos': #pausando ou não os efeitos sonoros
                             toggle_som()
                             efeitos_sonoros['click_som'].play()
-                        elif name == 'botaoMusica':
+                        elif name == 'botaoMusica':     #pausando ou não a musica
                             efeitos_sonoros['click_som'].play()
                             pygame.mixer.music.pause() if pygame.mixer.music.get_busy() else pygame.mixer.music.unpause()
                             
@@ -240,6 +244,7 @@ class TelaOptions():
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.voltar = True
         return True
+    
     def troca_tela(self):
         if self.voltar:
             return TelaInicial(self.tela)
@@ -248,6 +253,7 @@ class TelaOptions():
         else:
             return self
         
+#criando classe da tela de tutorial
 class TelaTutorial():
     def __init__(self, tela):
         self.tela = tela
@@ -257,9 +263,10 @@ class TelaTutorial():
         self.voltar = False
     
     def desenha(self):
-        self.tela.blit(self.fundo, (0,0))
+        self.tela.blit(self.fundo, (0,0))   #colocando a sprite de fundo
         texto = self.fonte.render('voltar', True, (255, 255, 255))
-        self.tela.blit(texto, (200, 700))
+        self.tela.blit(texto, (200, 700))   # colocando o botã de voltar
+
     def update(self):
         pygame.display.update()
         for event in pygame.event.get():
@@ -275,19 +282,21 @@ class TelaTutorial():
             return TelaInicial(self.tela)
         else:
             return self
+        
+#criando classe da tela de morte
 class TelaMorte:
     def __init__(self, tela):
         self.tela = tela
         self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 60)
         self.fonte2 = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 36)
         efeitos_sonoros['wasted_som'].play()
-        self.botaoVoltar = pygame.Rect(200, 700, 150, 40)
+        self.botaoVoltar = pygame.Rect(200, 700, 150, 40) #botão para voltar a tela inicial
         self.botaoVoltar.centerx, self.botaoVoltar.centery = 250, 700
         self.inicio = False
         for nome, som in efeitos_sonoros.items():
             if nome != 'wasted_som':
                 som.stop()
-    def grayscale(self, tela):
+    def grayscale(self, tela): #função para fazer a tela de jogo para de descer, e receber um filto que faz a tela receber uma lente cinza
         arr = pygame.surfarray.array3d(tela)
         # weights are from the "luma" color space
         luma = arr[:,:,0]*0.3 + arr[:,:,1]*0.59 + arr[:,:,2]*0.11
@@ -296,13 +305,13 @@ class TelaMorte:
         arr[:,:,2] = luma
         return pygame.surfarray.make_surface(arr)
 
-    def desenha(self):
+    def desenha(self):  #desenhando mensagem e botão de voltar
         text = self.fonte.render("WASTED", 1, (255,255,255))
         textoVoltar = self.fonte2.render('voltar', True, (255, 255, 255))
         textpos = text.get_rect(centerx=250, centery=400)
 
         # Convert screen to grayscale
-        gray_tela = self.grayscale(self.tela)
+        gray_tela = self.grayscale(self.tela)   #tranformando a tela em cinza
 
         # Draw gray-scaled image on the main screen
         self.tela.blit(gray_tela, (0,0))
