@@ -130,11 +130,11 @@ class TelaJogo:
     
     def troca_tela(self):
         if self.player.checarMorte():
+            pygame.mixer_music.stop()
             self.salvar_highscore()
             efeitos_sonoros['wasted_som'].play()
             return TelaMorte(self.tela)
         else:
-            pygame.mixer_music.stop()
             return self 
 class TelaRanking():
     def __init__(self, tela):
@@ -274,6 +274,9 @@ class TelaMorte:
         self.botaoVoltar = pygame.Rect(200, 700, 150, 40)
         self.botaoVoltar.centerx, self.botaoVoltar.centery = 250, 700
         self.inicio = False
+        for nome, som in efeitos_sonoros.items():
+            if nome != 'wasted_som':
+                som.stop()
     def grayscale(self, tela):
         arr = pygame.surfarray.array3d(tela)
         # weights are from the "luma" color space
@@ -313,5 +316,6 @@ class TelaMorte:
 
     def troca_tela(self):
         if self.inicio:
+            pygame.mixer_music.play(-1)
             return TelaInicial(self.tela)
         return self

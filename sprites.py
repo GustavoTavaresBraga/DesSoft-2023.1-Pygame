@@ -28,7 +28,7 @@ efeitos_sonoros = {
     'wasted_som':pygame.mixer.Sound('assets/wasted.ogg')
 }
 efeitos_sonoros['minecart_som'].set_volume(0.5)
-def toggle_som():   
+def toggle_som():
     for som in efeitos_sonoros.values():
         if som.get_volume() == 0:
             som.set_volume(1)
