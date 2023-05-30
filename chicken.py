@@ -2,7 +2,7 @@ import pygame
 import random
 from sprites import sprites, efeitos_sonoros
 class Player():
-    def __init__(self, velocidade = 2, vidas = 1):
+    def __init__(self, velocidade = 2, vidas = 3):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
         self.rect = pygame.Rect(0, 0, 40, 40)

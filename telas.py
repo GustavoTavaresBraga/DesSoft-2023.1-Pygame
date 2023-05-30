@@ -20,11 +20,8 @@ class TelaInicial():
         self.tutorial = False
         self.caixaTexto = CaixaTexto(self.fonte, tela)
     def desenha(self):
-        
-        self.tela.fill((255, 255, 255))
         self.tela.blit(self.fundo, (0, 0))
         self.caixaTexto.desenha()
-        pygame.draw.rect(self.tela, "white", self.botaoTutorial , 5)
         pygame.display.update()
 
     def update(self):
@@ -67,20 +64,21 @@ class TelaJogo:
     def __init__(self, tela, nome='',opcoes= None):
         self.opcoes = opcoes
         if self.opcoes == None: 
-            self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
+            self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
         self.frame = 0
         self.tela = tela
         self.y = 0
         self.clock = pygame.time.Clock()
         self.player = Player(self.opcoes['Velocidade'], self.opcoes['Vidas'])
         self.fonte  = pygame.font.Font(None, 36)
+        self.fonte2  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 40)
         self.nome = nome
         self.velocidade = self.opcoes['Velocidade']
         print(self.velocidade)
         for i in range(17):
             self.nova_fileira(y=800-(i*50))
     def nova_fileira(self, y=0):
-        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama'])
+        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama', 'agua', 'trilho'])
         if y > 500 and y <850:
             block = 'grama'
         direcao = random.choice([1, -1])
@@ -124,6 +122,9 @@ class TelaJogo:
             self.tela.blit(i.image, i.rect)
         self.tela.blit(self.player.image, self.player.rect)
         t = "pontuacao: " + str(self.player.score)
+        textoVidas = self.fonte2.render(str(self.player.vidas), True, (255, 255, 255))
+        self.tela.blit(textoVidas, (20, 10))
+        self.tela.blit(sprites['coracao'], (50, 10))
         texto = self.fonte.render(t, True, (255, 255, 255))
         self.tela.blit(texto, (300, 10))
         pygame.display.update()
@@ -227,36 +228,22 @@ class TelaOptions():
 class TelaTutorial():
     def __init__(self, tela):
         self.tela = tela
-        self.fundo = sprites['ranking']
+        self.fundo = sprites['tutorial']
         self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
         self.botaoSair = pygame.Rect(200, 700, 105, 25)
         self.voltar = False
     
     def desenha(self):
         self.tela.blit(self.fundo, (0,0))
-        texto1 = self.fonte.render('voltar', True, (255, 255, 255))
-        self.tela.blit(texto1, (200, 700))
-        font = pygame.font.SysFont(None, 60)
-        font2 = pygame.font.SysFont(None, 30)
-        text = font.render('TUTORIAL', True, (255, 255, 255))
-        texto = 'Para jogar serão utilizadas as setas do teclado para movimentar para frente, para trás, para a direita e para a esquerda. Sua missão é atravessar o mapa sem ser atingido pelos carrinhos de mineração e sem cair nos rios. Vão ter barcos para te ajudar na travessia dos rios. Quanto mais longe chegar, mais pontuará. Aproveite o jogo!'
-        text2 = font2.render(texto, True, (255, 255, 255))
-        self.tela.blit(text, (10, 10))
-        self.tela.blit(text2, (10, 100))
-        pygame.draw.rect(self.tela, "white", self.botaoSair , 5)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return False
-        pygame.display.update()
-
+        texto = self.fonte.render('voltar', True, (255, 255, 255))
+        self.tela.blit(texto, (200, 700))
     def update(self):
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
                 self.voltar = True
                 efeitos_sonoros['click_som'].play()
         return True
@@ -309,7 +296,7 @@ class TelaMorte:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoVoltar.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoVoltar.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
                 self.inicio = True
                 efeitos_sonoros['wasted_som'].stop()
         return True

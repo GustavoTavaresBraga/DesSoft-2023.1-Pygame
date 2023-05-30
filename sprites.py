@@ -20,6 +20,8 @@ sprites = {
     'botaoVidas':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVidas.png'), (400, 40)),
     'botaoVoltar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVoltar.png'), (200, 40)),
     'botaoJogar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoJogar.png'), (200, 40)),
+    'tutorial':pygame.transform.scale(pygame.image.load('assets/sprites/tutorial.png'), (500, 800)),
+    'coracao':pygame.transform.scale(pygame.image.load('assets/sprites/coracao.png'), (35, 35)),
 }
 efeitos_sonoros = {
     'click_som':pygame.mixer.Sound('assets/click.ogg'),
