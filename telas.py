@@ -61,6 +61,9 @@ class TelaInicial():
         
 class TelaJogo:
     def __init__(self, tela, nome='',opcoes= None):
+        sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50))
+        sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50))
+        sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50))
         self.opcoes = opcoes
         if self.opcoes == None: 
             self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
@@ -115,6 +118,11 @@ class TelaJogo:
                 return False
         self.player.update()
         self.clock.tick(30)
+        if self.player.score >= 10:
+            sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
+            sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/rail.png'), (50, 50))
+            sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
+        
         return True
     
     def desenha(self):
