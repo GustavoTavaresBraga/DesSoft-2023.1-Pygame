@@ -3,26 +3,31 @@ import random
 from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *
 global jogador
+
+# criando classe para a tela inicial do jogo
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
         self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
         self.fundo = sprites['inicio']
+        #adicionando os botões funcionais da tela
         self.botaoPlay = pygame.Rect(55, 405, 425, 40)
         self.botaoRanking = pygame.Rect(55, 460, 425, 40)
         self.botaoSair = pygame.Rect(275, 585, 210, 40)
         self.botaoOptions = pygame.Rect(55, 585, 210, 40)
         self.botaoTutorial = pygame.Rect(5,585, 40, 42 )
+        # variaveis como falsas, caso cliquem no botão elaa mudam para verdadeiras, e permitem a troca de tela
         self.play = False
         self.options = False
         self.ranking = False
         self.tutorial = False
         self.caixaTexto = CaixaTexto(self.fonte, tela)
-    def desenha(self):
+    def desenha(self):  #para o usuario escrever o nome
         self.tela.blit(self.fundo, (0, 0))
         self.caixaTexto.desenha()
         pygame.display.update()
 
+    #atualização da tela inicial
     def update(self):
         for event in pygame.event.get():
             self.caixaTexto.escreve(event)
@@ -31,6 +36,7 @@ class TelaInicial():
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button click
                 mouse_x, mouse_y = event.pos
+                #condições para checar se clicaram em algum botão, e se sim, para ativar o sons de clique
                 if self.botaoPlay.collidepoint(mouse_x, mouse_y):
                     self.play = True
                     efeitos_sonoros['click_som'].play()
@@ -48,6 +54,7 @@ class TelaInicial():
                     return False
         return True
     def troca_tela(self):
+        # função para trocar as telas, utilizando as variaveis da função init
         if self.play:
             return TelaJogo(self.tela, self.caixaTexto.texto)
         elif self.ranking:
@@ -58,14 +65,18 @@ class TelaInicial():
             return TelaTutorial(self.tela)
         else:
             return self
-        
+
+#criando classe da tela do jogo
 class TelaJogo:
     def __init__(self, tela, nome='',opcoes= None):
+        # chamando as sprites a serem utilizadas inicialmente
         sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50))
         sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50))
         sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50))
+        # a variavel opções, é para caso o usuario tenha customizado o jogo na aba de opções no inicio
+        # essa variavel agrupa um dicionario as utilidades escolhidades
         self.opcoes = opcoes
-        if self.opcoes == None: 
+        if self.opcoes == None: # caso o usuario não tenha personalizado, ele jogara no modo clasico, com as opções padrões:
             self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
         self.frame = 0
         self.tela = tela
@@ -78,20 +89,20 @@ class TelaJogo:
         self.nome = nome
         self.velocidade = self.opcoes['Velocidade']
         print(self.velocidade)
-        for i in range(17):
-            self.nova_fileira(y=800-(i*50))
+        for i in range(17): #criando as fileiras de blocos na tela do jogo
+            self.nova_fileira(y=800-(i*50)) # preenchendo as fileiras com as sprites
     def nova_fileira(self, y=0):
-        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama', 'agua', 'trilho'])
-        if y > 500 and y <850:
+        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama', 'agua', 'trilho']) #opções das sprites que podem ser escolhidas inicialmete, algumas possuem mais chances de serem escolhidas
+        if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de agua ou trilho, e sim sobre um bloco de grama
             block = 'grama'
-        direcao = random.choice([1, -1])
-        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
-        while speedbarco == self.speedAnterior:
+        direcao = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
+        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)     #escolhendo aleatoriamente a velocidade do barco de cada fileira
+        while speedbarco == self.speedAnterior:     #verificando que os barcos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
             speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
-        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3)
+        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
 
-        self.speedAnterior = speedbarco
-        temBarco = False
+        self.speedAnterior = speedbarco     # atualizando a velocidade do barco anterior com a do novo barco anterior
+        temBarco = False   
         for i in range(10):
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
@@ -102,13 +113,13 @@ class TelaJogo:
             elif not temBarco and i == 9 and block == 'agua':
                 Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
             if block == 'trilho' and random.randint(0, (10-self.opcoes['NMinecarts'])) == 0:Minecart(i * 50 + 25, y, self.player, speedcart, direcao)
-    def salvar_highscore(self):
+    def salvar_highscore(self):     #salvando a pontuação do jogador
         if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.player.score)
             with open('assets/scores.csv', 'a') as f:
                 f.write(string)
                 print(string)
-    def update(self):
+    def update(self):       #função para atualizar a tela
         if self.y >= int(50/self.player.velocidade): # Gerar uma nova fileira em cima
             self.nova_fileira()
             self.y = 0
@@ -125,7 +136,7 @@ class TelaJogo:
         
         return True
     
-    def desenha(self):
+    def desenha(self):      #desenhando a pontuação e a quantidade de vidas do jogador
         self.tela.fill((255, 255, 255))
         for i in self.player.blocos:
             self.tela.blit(i.image, i.rect)
@@ -147,6 +158,8 @@ class TelaJogo:
             return TelaMorte(self.tela)
         else:
             return self 
+        
+#criando classe da tela de ranking
 class TelaRanking():
     def __init__(self, tela):
         self.ranking = {}

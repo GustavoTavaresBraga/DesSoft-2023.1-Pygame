@@ -1,6 +1,7 @@
 import pygame
 pygame.mixer.init()
 
+#criando dicionario com todas as sprites, para facilitar chama-las nas funções
 sprites = {
     'grama': pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50)),
     'agua': pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50)),
@@ -23,13 +24,14 @@ sprites = {
     'tutorial':pygame.transform.scale(pygame.image.load('assets/sprites/tutorial.png'), (500, 800)),
     'coracao':pygame.transform.scale(pygame.image.load('assets/sprites/coracao.png'), (35, 35)),
 }
+#criando dicionario com todas as musicas, para facilitar chama-las nas funções
 efeitos_sonoros = {
     'click_som':pygame.mixer.Sound('assets/click.ogg'),
     'morte_som':pygame.mixer.Sound('assets/morte.ogg'),
     'minecart_som':pygame.mixer.Sound('assets/Minecart.ogg'),
     'wasted_som':pygame.mixer.Sound('assets/wasted.ogg')
 }
-efeitos_sonoros['minecart_som'].set_volume(0.5)
+efeitos_sonoros['minecart_som'].set_volume(0.5) #ajuste de volume
 def toggle_som():
     for som in efeitos_sonoros.values():
         if som.get_volume() == 0:
