@@ -1,6 +1,9 @@
+# Importa as bibliotecas que serão utilizadas no código
 import pygame
 from sprites import sprites, efeitos_sonoros
+# Cria a classe do jogador
 class Player():
+    #
     def __init__(self, velocidade = 2, vidas = 3):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
@@ -18,6 +21,8 @@ class Player():
         self.obstaculos = []
         self.velocidade = velocidade
         self.imunidade = 0
+
+    # Cria a função update para atualizar a posição do jogador
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movimento is None and self.rect.bottom >= 50: self.movimento = 'cima'
@@ -70,6 +75,8 @@ class Player():
             i.update(self.velocidade)
         self.imunidade -= 1
         self.rect.bottom += self.velocidade # Mexer a galinha pra baixo
+
+    # Confere se o jogador morreu
     def checarMorte(self):
         if self.vidas <= 0:
                 return True
@@ -100,7 +107,9 @@ class Player():
             self.image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         return False
 
+# Cria a classe do carrinho de mineração
 class Minecart():
+    #
     def __init__(self, x, y, player, speed, direcao):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['minecart']
@@ -111,6 +120,8 @@ class Minecart():
         self.tipo = 'minecart'
         self.speedX = speed*direcao
         player.obstaculos.append(self)
+
+    # Atualiza as posições do carrinho de mineração
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
         self.rect.centerx += self.speedX
@@ -121,7 +132,10 @@ class Minecart():
             efeitos_sonoros['minecart_som'].fadeout(4000)
         elif self.rect.centerx > 550 and self.direcao == 1:
             self.rect.centerx = -50
+
+# Cria a classe do barco
 class Barco():
+    #
     def __init__(self, x, y, player, speed, direcao):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['barco']
@@ -132,6 +146,8 @@ class Barco():
         self.direcao = direcao
         self.speedX = speed*direcao
         player.obstaculos.append(self)
+
+    # Atualiza a posição do barco
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
         self.rect.centerx += self.speedX
@@ -139,7 +155,10 @@ class Barco():
             self.rect.centerx = 525
         elif self.rect.centerx > 525 and self.direcao == 1:
             self.rect.centerx = -25
+
+# Cria a classe da água
 class Agua():
+    #
     def __init__(self, x, y, player):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['agua']
@@ -148,9 +167,14 @@ class Agua():
         self.rect.bottom = y
         self.tipo = 'agua'
         player.blocos.append(self)
+
+    #
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
+
+# Cria a classe da grama
 class Grama():
+    #
     def __init__(self, x, y, player):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['grama']
@@ -159,9 +183,14 @@ class Grama():
         self.rect.bottom = y
         self.tipo = 'grama'
         player.blocos.append(self)
+    
+    #
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
+
+# Cria classe do trilho
 class Trilho():
+    #
     def __init__(self, x, y, player):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['trilho']
@@ -170,9 +199,14 @@ class Trilho():
         self.rect.bottom = y
         self.tipo = 'trilho'
         player.blocos.append(self)
+
+    #
     def update(self, velocidade = 2):
         self.rect.bottom += velocidade # 
+
+# Cria a classe da caixa de texto
 class CaixaTexto():
+    #
     def __init__ (self, fonte, tela):
         self.rect = pygame.Rect(140, 510, 430 , 35)
         self.texto = 'escreva seu nome'
@@ -183,6 +217,7 @@ class CaixaTexto():
         self.tela = tela
         self.nome = ''
     
+    #
     def escreve(self, event): 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             #Muda cor caso clicado
@@ -205,5 +240,7 @@ class CaixaTexto():
                 self.rect.width += 20
                 self.rect.x -= 7
             self.texto_surface = self.fonte.render(self.texto, True, (211, 211, 211))
+
+    #
     def desenha(self):
         self.tela.blit(self.texto_surface, (self.rect.x + 5, self.rect.y + 5))
