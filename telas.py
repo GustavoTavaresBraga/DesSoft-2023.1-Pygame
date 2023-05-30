@@ -67,6 +67,7 @@ class TelaJogo:
         self.frame = 0
         self.tela = tela
         self.y = 0
+        self.speedAnterior = 0
         self.clock = pygame.time.Clock()
         self.player = Player(self.opcoes['Velocidade'], self.opcoes['Vidas'])
         self.fonte  = pygame.font.Font(None, 36)
@@ -82,8 +83,11 @@ class TelaJogo:
             block = 'grama'
         direcao = random.choice([1, -1])
         speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
+        while speedbarco == self.speedAnterior:
+            speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
         speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3)
 
+        self.speedAnterior = speedbarco
         temBarco = False
         for i in range(10):
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
