@@ -131,9 +131,11 @@ class TelaJogo:
     def troca_tela(self):
         if self.player.checarMorte():
             self.salvar_highscore()
-            return TelaInicial(self.tela)
+            efeitos_sonoros['wasted_som'].play()
+            return TelaMorte(self.tela)
         else:
-            return self
+            pygame.mixer_music.stop()
+            return self 
 class TelaRanking():
     def __init__(self, tela):
         self.ranking = {}
@@ -263,3 +265,53 @@ class TelaTutorial():
             return TelaInicial(self.tela)
         else:
             return self
+class TelaMorte:
+    def __init__(self, tela):
+        self.tela = tela
+        self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 60)
+        self.fonte2 = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 36)
+
+        self.botaoVoltar = pygame.Rect(200, 700, 150, 40)
+        self.botaoVoltar.centerx, self.botaoVoltar.centery = 250, 700
+        self.inicio = False
+    def grayscale(self, tela):
+        arr = pygame.surfarray.array3d(tela)
+        # weights are from the "luma" color space
+        luma = arr[:,:,0]*0.3 + arr[:,:,1]*0.59 + arr[:,:,2]*0.11
+        arr[:,:,0] = luma
+        arr[:,:,1] = luma
+        arr[:,:,2] = luma
+        return pygame.surfarray.make_surface(arr)
+
+    def desenha(self):
+        text = self.fonte.render("WASTED", 1, (255,255,255))
+        textoVoltar = self.fonte2.render('voltar', True, (255, 255, 255))
+        textpos = text.get_rect(centerx=250, centery=400)
+
+        # Convert screen to grayscale
+        gray_tela = self.grayscale(self.tela)
+
+        # Draw gray-scaled image on the main screen
+        self.tela.blit(gray_tela, (0,0))
+
+        # Draw "WASTED" in the center of the screen
+        self.tela.blit(text, textpos)
+        self.tela.blit(textoVoltar, (190, 685))
+
+
+        pygame.display.update()
+
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoVoltar.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
+                self.inicio = True
+                efeitos_sonoros['wasted_som'].stop()
+        return True
+
+    def troca_tela(self):
+        if self.inicio:
+            return TelaInicial(self.tela)
+        return self

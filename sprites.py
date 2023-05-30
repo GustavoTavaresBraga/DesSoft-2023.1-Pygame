@@ -24,7 +24,8 @@ sprites = {
 efeitos_sonoros = {
     'click_som':pygame.mixer.Sound('assets/click.ogg'),
     'morte_som':pygame.mixer.Sound('assets/morte.ogg'),
-    'minecart_som':pygame.mixer.Sound('assets/Minecart.ogg')
+    'minecart_som':pygame.mixer.Sound('assets/Minecart.ogg'),
+    'wasted_som':pygame.mixer.Sound('assets/wasted.ogg')
 }
 efeitos_sonoros['minecart_som'].set_volume(0.5)
 def toggle_som():   
