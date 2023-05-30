@@ -1,5 +1,4 @@
 import pygame
-import textwrap
 import random
 from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *

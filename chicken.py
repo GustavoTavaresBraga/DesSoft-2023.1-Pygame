@@ -1,14 +1,14 @@
 import pygame
-import random
 from sprites import sprites, efeitos_sonoros
 class Player():
     def __init__(self, velocidade = 2, vidas = 3):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
-        self.rect = pygame.Rect(0, 0, 40, 40)
+        self.rect = pygame.Rect(0, 0, 30, 40)
         self.rect.centerx = 500 / 2
         self.rect.bottom = 690
         self.movimento = None
+        self.original_image = self.image.copy()
         self.moveu = 0
         self.noBarco = False
         self.blocos = []
@@ -20,7 +20,7 @@ class Player():
         self.imunidade = 0
     def update(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.movimento is None: self.movimento = 'cima'
+        if keys[pygame.K_UP] and self.movimento is None and self.rect.bottom >= 50: self.movimento = 'cima'
         if keys[pygame.K_DOWN] and self.movimento is None and self.rect.bottom <= 750: self.movimento = 'baixo'
         if keys[pygame.K_LEFT] and self.movimento is None and self.rect.centerx >= 50: self.movimento = 'esquerda'
         if keys[pygame.K_RIGHT] and self.movimento is None and self.rect.centerx <= 450: self.movimento = 'direita'
@@ -70,31 +70,34 @@ class Player():
             i.update(self.velocidade)
         self.imunidade -= 1
         self.rect.bottom += self.velocidade # Mexer a galinha pra baixo
-        print(self.imunidade)
     def checarMorte(self):
         if self.vidas <= 0:
                 return True
-        if self.imunidade <= 0:
-            if self.rect.bottom > 840:
+        self.image.blit(self.original_image, (0, 0))
+        if self.rect.bottom > 840:
+            efeitos_sonoros['morte_som'].play()
+            return True
+        self.noBarco = False
+        for i in self.obstaculos:
+            if i.rect.colliderect(self.rect) and i.tipo == 'minecart' and self.imunidade <= 0:
+                self.vidas -= 1
                 efeitos_sonoros['morte_som'].play()
-                return True
-            self.noBarco = False
-            for i in self.obstaculos:
-                if i.rect.colliderect(self.rect) and i.tipo == 'minecart':
+                self.imunidade = 50
+                return False
+            if i.rect.colliderect(self.rect) and i.tipo == 'barco':
+                self.noBarco = True
+                self.speedBoat = i.speedX
+        for i in self.blocos:
+            if i.rect.colliderect(self.rect) and i.tipo == 'agua':
+                if not self.noBarco and self.imunidade <= 0:
                     self.vidas -= 1
                     efeitos_sonoros['morte_som'].play()
                     self.imunidade = 50
                     return False
-                if i.rect.colliderect(self.rect) and i.tipo == 'barco':
-                    self.noBarco = True
-                    self.speedBoat = i.speedX
-            for i in self.blocos:
-                if i.rect.colliderect(self.rect) and i.tipo == 'agua':
-                    if not self.noBarco:
-                        self.vidas -= 1
-                        efeitos_sonoros['morte_som'].play()
-                        self.imunidade = 50
-                        return False
+        if self.imunidade > 25:
+            tint = pygame.Surface(self.image.get_size()).convert_alpha()
+            tint.fill((255, 0, 0))
+            self.image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         return False
 
 class Minecart():
