@@ -136,7 +136,6 @@ class TelaJogo:
         if self.player.checarMorte():
             pygame.mixer_music.stop()
             self.salvar_highscore()
-            efeitos_sonoros['wasted_som'].play()
             return TelaMorte(self.tela)
         else:
             return self 
@@ -260,7 +259,7 @@ class TelaMorte:
         self.tela = tela
         self.fonte = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 60)
         self.fonte2 = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 36)
-
+        efeitos_sonoros['wasted_som'].play()
         self.botaoVoltar = pygame.Rect(200, 700, 150, 40)
         self.botaoVoltar.centerx, self.botaoVoltar.centery = 250, 700
         self.inicio = False

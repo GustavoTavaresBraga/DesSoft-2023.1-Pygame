@@ -7,7 +7,7 @@ class Player():
     def __init__(self, velocidade = 2, vidas = 3):
         pygame.sprite.Sprite.__init__(self)
         self.image = sprites['chicken']
-        self.rect = pygame.Rect(0, 0, 30, 40)
+        self.rect = pygame.Rect(0, 0, 40, 40)
         self.rect.centerx = 500 / 2
         self.rect.bottom = 690
         self.movimento = None
