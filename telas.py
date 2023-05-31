@@ -110,11 +110,7 @@ class TelaJogo:
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
             elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
-<<<<<<< HEAD
             if block == 'agua' and random.randint(0, (6-self.opcoes['NBarcos'])) == 0:
-=======
-            if block == 'agua' and random.randint(0, (8-self.opcoes['NBarcos'])) == 0:
->>>>>>> ffc7009c5a5c62e23a4c1a376092869580253217
                 Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
                 temBarco = True
             elif not temBarco and i == 9 and block == 'agua':
@@ -136,12 +132,12 @@ class TelaJogo:
                 return False
         self.player.update()
         self.clock.tick(30)
-        if self.player.score >= 200:
+        if self.player.score >= 200: # caso o jogador tenha mais de 200 pontos, as sprites mudam para o end
             sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/endstone.png'), (50, 50))
             sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilhoEnd.png'), (50, 50))
             sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/void.png'), (50, 50))
             sprites['barco'] = pygame.transform.scale(pygame.image.load('assets/sprites/elitra.png'), (50, 50))
-        elif self.player.score >= 100:
+        elif self.player.score >= 100: # caso o jogador tenha mais de 100 pontos, as sprites mudam para o nether
             sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
             sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/rail.png'), (50, 50))
             sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
@@ -149,7 +145,7 @@ class TelaJogo:
     
     def desenha(self):      #desenhando a pontuação e a quantidade de vidas do jogador
         self.tela.fill((255, 255, 255))
-        for i in self.player.blocos:
+        for i in self.player.blocos: 
             self.tela.blit(i.image, i.rect)
         for i in self.player.obstaculos:
             self.tela.blit(i.image, i.rect)
