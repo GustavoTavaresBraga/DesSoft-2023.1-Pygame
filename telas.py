@@ -78,11 +78,12 @@ class TelaJogo:
         # essa variavel agrupa um dicionario as utilidades escolhidades
         self.opcoes = opcoes
         if self.opcoes == None: # caso o usuario não tenha personalizado, ele jogara no modo clasico, com as opções padrões:
-            self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
+            self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 6, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
         self.frame = 0
         self.tela = tela
         self.y = 0
         self.speedAnterior = 0
+        self.speedAnteriorCart = 0
         self.clock = pygame.time.Clock()
         self.player = Player(self.opcoes['Velocidade'], self.opcoes['Vidas'])
         self.fonte  = pygame.font.Font(None, 36)
@@ -98,19 +99,21 @@ class TelaJogo:
             block = 'grama'
         direcao = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
         speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)   
+        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
         if self.player.score >= 200:
             speedbarco = 10  #escolhendo aleatoriamente a velocidade do barco de cada fileira
-        while speedbarco == self.speedAnterior:     #verificando que os barcos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
+        while speedbarco == self.speedAnterior or (self.speedAnteriorCart == speedbarco):     #verificando que os barcos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
             speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
-        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
-
-        self.speedAnterior = speedbarco     # atualizando a velocidade do barco anterior com a do novo barco anterior
+        while speedcart == self.speedAnteriorCart or (speedcart == self.speedAnterior): #verificando que os carrinhos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
+            speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
+        self.speedAnterior = speedbarco
+        self.speedAnteriorCart = speedcart   # atualizando a velocidade do barco anterior com a do novo barco anterior
         temBarco = False   
         for i in range(10):
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
             elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
-            if block == 'agua' and random.randint(0, (6-self.opcoes['NBarcos'])) == 0:
+            if block == 'agua' and random.randint(0, (10-self.opcoes['NBarcos'])) == 0:
                 Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
                 temBarco = True
             elif not temBarco and i == 9 and block == 'agua':
@@ -172,20 +175,20 @@ class TelaRanking():
         self.ranking = {}
         self.tela = tela
         self.fundo = sprites['ranking']
-        with open('assets/scores.csv', 'r') as scores:
+        with open('assets/scores.csv', 'r') as scores: #lendo o arquivo de pontuações
             for line in scores:
                 nome, score = line.split(',')
                 self.ranking[nome] = int(score)
-        self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True)
-        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30)
+        self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True) #ordenando as pontuações
+        self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30) 
         self.botaoSair = pygame.Rect(0, 0, 100, 50)
         self.voltar = False
-    def desenha(self):
+    def desenha(self): 
         self.tela.fill((0, 0, 0))
         self.tela.blit(self.fundo, (0,0))
         texto1 = self.fonte.render('voltar', True, (255, 255, 255))
         self.tela.blit(texto1, (0, 0))
-        for i in range(len(self.ranking)):
+        for i in range(len(self.ranking)): #escrevendo as pontuações na tela
             nome, score = self.ranking[i]
             texto = self.fonte.render(str(i+1)+'. '+nome+' - '+str(score), True, (255, 255, 255))
             self.tela.blit(texto, (100, 100+i*50))
@@ -197,7 +200,7 @@ class TelaRanking():
                 pygame.quit()
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.botaoSair.collidepoint(event.pos) or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE): # Left mouse button click
-                self.voltar = True
+                self.voltar = True 
                 efeitos_sonoros['click_som'].play()
         return True
     def troca_tela(self):
