@@ -141,13 +141,16 @@ class Minecart():
 class Barco():
     #
     def __init__(self, x, y, player, speed, direcao):
+        self.direcao = direcao
         pygame.sprite.Sprite.__init__(self)
-        self.image = sprites['barco']
+        if self.direcao == 1:
+            self.image = sprites['barco']
+        else:
+            self.image = pygame.transform.flip(sprites['barco'], True, False)
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
         self.tipo = 'barco'
-        self.direcao = direcao
         self.speedX = speed*direcao
         player.obstaculos.append(self)
 
