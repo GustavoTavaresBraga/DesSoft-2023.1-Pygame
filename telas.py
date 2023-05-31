@@ -107,7 +107,7 @@ class TelaJogo:
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
             elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
-            if block == 'agua' and random.randint(0, (10-self.opcoes['NBarcos'])) == 0:
+            if block == 'agua' and random.randint(0, (8-self.opcoes['NBarcos'])) == 0:
                 Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
                 temBarco = True
             elif not temBarco and i == 9 and block == 'agua':
