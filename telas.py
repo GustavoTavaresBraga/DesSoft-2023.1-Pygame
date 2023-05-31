@@ -73,6 +73,7 @@ class TelaJogo:
         sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50))
         sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50))
         sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50))
+        sprites['barco'] = pygame.transform.scale(pygame.image.load('assets/sprites/barco.png'), (50, 50))
         # a variavel opções, é para caso o usuario tenha customizado o jogo na aba de opções no inicio
         # essa variavel agrupa um dicionario as utilidades escolhidades
         self.opcoes = opcoes
@@ -96,7 +97,9 @@ class TelaJogo:
         if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de agua ou trilho, e sim sobre um bloco de grama
             block = 'grama'
         direcao = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
-        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)     #escolhendo aleatoriamente a velocidade do barco de cada fileira
+        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)   
+        if self.player.score >= 200:
+            speedbarco = 10  #escolhendo aleatoriamente a velocidade do barco de cada fileira
         while speedbarco == self.speedAnterior:     #verificando que os barcos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
             speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
         speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
@@ -107,7 +110,11 @@ class TelaJogo:
             if block == 'grama':Grama(i * 50 + 25, y, self.player)
             elif block == 'agua':Agua(i * 50 + 25, y, self.player)
             elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
+<<<<<<< HEAD
             if block == 'agua' and random.randint(0, (6-self.opcoes['NBarcos'])) == 0:
+=======
+            if block == 'agua' and random.randint(0, (8-self.opcoes['NBarcos'])) == 0:
+>>>>>>> ffc7009c5a5c62e23a4c1a376092869580253217
                 Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
                 temBarco = True
             elif not temBarco and i == 9 and block == 'agua':
@@ -129,11 +136,15 @@ class TelaJogo:
                 return False
         self.player.update()
         self.clock.tick(30)
-        if self.player.score >= 10:
+        if self.player.score >= 200:
+            sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/endstone.png'), (50, 50))
+            sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilhoEnd.png'), (50, 50))
+            sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/void.png'), (50, 50))
+            sprites['barco'] = pygame.transform.scale(pygame.image.load('assets/sprites/elitra.png'), (50, 50))
+        elif self.player.score >= 100:
             sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
             sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/rail.png'), (50, 50))
             sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
-        
         return True
     
     def desenha(self):      #desenhando a pontuação e a quantidade de vidas do jogador
