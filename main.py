@@ -1,7 +1,7 @@
 import pygame
-from telas import TelaInicial
 import random
-
+random.seed(1)
+from telas import TelaInicial
 def inicializa():
     """Função que inicializa o jogo e carrega os assets
         Retorna um dicionário com os assets
@@ -18,7 +18,7 @@ def inicializa():
 
 def game_loop():
     """Função que inicializa o jogo e chama as telas
-        Caso a tela seja trocada, a função chama a nova tela
+        Caso a tela seja trocada, a funcdção chama a nova tela
     """
     tela = inicializa()
     tela_atual = TelaInicial(tela)
