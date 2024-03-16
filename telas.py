@@ -150,6 +150,7 @@ class TelaJogo:
         self.tela.fill((255, 255, 255))
         for i in self.player.entities:
             self.tela.blit(i.image, i.rect)
+        print(self.player.immunity)
         self.tela.blit(self.player.image, self.player.rect)
         t = "pontuacao: " + str(self.player.score)
         textoVidas = self.fonte2.render(str(self.player.vidas), True, (255, 255, 255))
@@ -160,7 +161,7 @@ class TelaJogo:
         pygame.display.update()
     
     def troca_tela(self):
-        if self.player.checarMorte():
+        if self.player.morreu:
             pygame.mixer_music.stop()
             self.salvar_highscore()
             return TelaMorte(self.tela)

@@ -68,12 +68,12 @@ class Rails(Entity):
 class Player():
     def __init__(self, speed = 2, vidas = 3):
         pygame.sprite.Sprite.__init__(self)
-        self.image = sprites['chicken']
+        self.original_image = sprites['chicken']
         self.rect = pygame.Rect(0, 0, 40, 40)
         self.rect.centerx = 500 / 2
         self.rect.bottom = 690
         self.movement = None
-        self.original_image = self.image.copy()
+        self.image = self.original_image.copy()
         self.moveu = 0
         self.onBoat = False
         self.vidas = vidas
@@ -82,6 +82,7 @@ class Player():
         self.entities = []
         self.speed = speed
         self.immunity = 0
+        self.morreu = False
 
     # Cria a função update para atualizar a posição do jogador
     def update(self):
@@ -94,10 +95,12 @@ class Player():
        
         if self.onBoat:        #condição para o jogador se movimentar junto com o barco
             self.rect.centerx += self.speedBoat
-            if self.rect.centerx < -25:
-                self.rect.centerx = 525
-            if self.rect.centerx > 525:
-                self.rect.centerx = -25
+
+            # easteregg para o jogador dar a volta na tela
+            # if self.rect.centerx < -25:
+            #     self.rect.centerx = 525
+            # if self.rect.centerx > 525:
+            #     self.rect.centerx = -25
 
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
@@ -107,13 +110,6 @@ class Player():
                 self.movement = None
                 self.moveu = 0
                 self.score += 1
-            
-            if self.onBoat:
-                closest_boat = min([i for i in self.entities if i.type == 'boat'], key=lambda x: abs(x.rect.centerx - self.rect.centerx))
-                # move towards closes boat
-                distance = abs(closest_boat.rect.centerx - self.rect.centerx)
-                if distance != 0:
-                    self.rect.centerx += 1 if closest_boat.rect.centerx > self.rect.centerx else -20
         if self.movement == 'baixo':
             self.rect.y += 10
             self.moveu +=1
@@ -133,7 +129,9 @@ class Player():
             if self.moveu > 5:
                 self.movement = None
                 self.moveu = 0
-
+        if self.movement == None:
+            if self.checarMorte():
+                self.morreu = True
         #conferir estado
         for i in self.entities:
             i.update()
@@ -146,7 +144,6 @@ class Player():
     def checarMorte(self):
         if self.vidas <= 0:     #conferindo se morreu pela falta de vidas
                 return True
-        self.image.blit(self.original_image, (0, 0))
         if self.rect.bottom > 840:      #conferindo se morreu porque a galinha foi mais devagar do que a screen e sumiu 
             efeitos_sonoros['morte_som'].play()     #som de morte da galinha
             return True
@@ -157,9 +154,10 @@ class Player():
                 self.vidas -= 1
                 efeitos_sonoros['morte_som'].play()
                 self.immunity = 50
-                return False
             if i.rect.colliderect(self.rect) and i.type == 'boat':
                 self.onBoat = True
+                self.rect.centerx = i.rect.centerx
+                # change boat color
                 self.speedBoat = i.speedX
         for i in self.entities:
             # Conferindo se a galinha se afougou sem estar imune, o que a faz perder uma vida e recber immunity por um curto tempo
@@ -168,12 +166,13 @@ class Player():
                     self.vidas -= 1
                     efeitos_sonoros['morte_som'].play()
                     self.immunity = 50
-                    return False
         if self.immunity > 25:
             # fazendo a galinha ficar vermelha, para ilustrar que ela sofreu dano/perdeu uma vida
             tint = pygame.Surface(self.image.get_size()).convert_alpha()
             tint.fill((255, 0, 0))
             self.image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        else:
+            self.image.blit(self.original_image, (0, 0))
         return False
 
 # Cria a classe da caixa de text
