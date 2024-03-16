@@ -3,10 +3,10 @@ pygame.mixer.init()
 
 #criando dicionario com todas as sprites, para facilitar chama-las nas funções
 sprites = {
-    'grama': pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50)),
-    'agua': pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50)),
-    'trilho': pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50)),
-    'barco': pygame.transform.scale(pygame.image.load('assets/sprites/barco.png'), (50, 50)),
+    'grass': pygame.transform.scale(pygame.image.load('assets/sprites/grass.png'), (50, 50)),
+    'water': pygame.transform.scale(pygame.image.load('assets/sprites/water.png'), (50, 50)),
+    'rails': pygame.transform.scale(pygame.image.load('assets/sprites/rails.png'), (50, 50)),
+    'boat': pygame.transform.scale(pygame.image.load('assets/sprites/boat.png'), (50, 50)),
     'minecart': pygame.transform.scale(pygame.image.load('assets/sprites/minecart.png'), (50, 50)),
     'chicken':pygame.transform.scale(pygame.image.load('assets/sprites/chicken.png'), (50, 50)),
     'botaoVelocidade':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVelocidade.png'), (400, 40)),

@@ -1,10 +1,10 @@
 import pygame
-import random
 from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *
 global jogador
-
+import random
 # criando classe para a tela inicial do jogo
+
 class TelaInicial():
     def __init__(self, tela):
         self.tela = tela
@@ -21,16 +21,16 @@ class TelaInicial():
         self.options = False
         self.ranking = False
         self.tutorial = False
-        self.caixaTexto = CaixaTexto(self.fonte, tela)
+        self.TextBox = TextBox(self.fonte, tela)
     def desenha(self):  #para o usuario escrever o nome
         self.tela.blit(self.fundo, (0, 0))
-        self.caixaTexto.desenha()
+        self.TextBox.desenha()
         pygame.display.update()
 
     #atualização da tela inicial
     def update(self):
         for event in pygame.event.get():
-            self.caixaTexto.escreve(event)
+            self.TextBox.escreve(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
@@ -56,7 +56,7 @@ class TelaInicial():
     def troca_tela(self):
         # função para trocar as telas, utilizando as variaveis da função init
         if self.play:
-            return TelaJogo(self.tela, self.caixaTexto.texto)
+            return TelaJogo(self.tela, self.TextBox.text)
         elif self.ranking:
             return TelaRanking(self.tela)
         elif self.options:
@@ -70,55 +70,55 @@ class TelaInicial():
 class TelaJogo:
     def __init__(self, tela, nome='',opcoes= None):
         # chamando as sprites a serem utilizadas inicialmente
-        sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50))
-        sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50))
-        sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50))
-        sprites['barco'] = pygame.transform.scale(pygame.image.load('assets/sprites/barco.png'), (50, 50))
+        sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/grass.png'), (50, 50))
+        sprites['rails'] = pygame.transform.scale(pygame.image.load('assets/sprites/rails.png'), (50, 50))
+        sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/water.png'), (50, 50))
+        sprites['boat'] = pygame.transform.scale(pygame.image.load('assets/sprites/boat.png'), (50, 50))
         # a variavel opções, é para caso o usuario tenha customizado o jogo na aba de opções no inicio
         # essa variavel agrupa um dicionario as utilidades escolhidades
         self.opcoes = opcoes
         if self.opcoes == None: # caso o usuario não tenha personalizado, ele jogara no modo clasico, com as opções padrões:
-            self.opcoes = {'Vidas': 3,'Velocidade': 2, 'NBarcos': 6, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
+            self.opcoes = {'Vidas': 3,'speed': 2, 'NBarcos': 6, 'NMinecarts': 5, 'VB': 4, 'VM': 4, 'Efeitos': True, 'Musica': True}
         self.frame = 0
         self.tela = tela
         self.y = 0
         self.speedAnterior = 0
         self.speedAnteriorCart = 0
         self.clock = pygame.time.Clock()
-        self.player = Player(self.opcoes['Velocidade'], self.opcoes['Vidas'])
+        self.player = Player()
         self.fonte  = pygame.font.Font(None, 36)
         self.fonte2  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 40)
         self.nome = nome
-        self.velocidade = self.opcoes['Velocidade']
-        print(self.velocidade)
-        for i in range(17): #criando as fileiras de blocos na tela do jogo
+        self.speed = self.opcoes['speed']
+        for i in range(17): #criando as fileiras de entities na tela do jogo
             self.nova_fileira(y=800-(i*50)) # preenchendo as fileiras com as sprites
     def nova_fileira(self, y=0):
-        block = random.choice(['grama', 'agua', 'trilho', 'grama', 'trilho', 'grama', 'agua', 'trilho']) #opções das sprites que podem ser escolhidas inicialmete, algumas possuem mais chances de serem escolhidas
-        if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de agua ou trilho, e sim sobre um bloco de grama
-            block = 'grama'
-        direcao = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
-        speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)   
-        speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
-        if self.player.score >= 200:
-            speedbarco = 10  #escolhendo aleatoriamente a velocidade do barco de cada fileira
-        while speedbarco == self.speedAnterior or (self.speedAnteriorCart == speedbarco):     #verificando que os barcos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
-            speedbarco = random.randint(self.opcoes['VB'], self.opcoes['VB']+3)
-        while speedcart == self.speedAnteriorCart or (speedcart == self.speedAnterior): #verificando que os carrinhos que estajam em fileiras seguidas uma da outra possuam velocidades diferentes, para assim o jogador sempre conseguir passar caso não tenha uma barco na frente de outro
-            speedcart = random.randint(self.opcoes['VM'], self.opcoes['VM']+3) #escolhendo a velocidade do carrinho
-        self.speedAnterior = speedbarco
-        self.speedAnteriorCart = speedcart   # atualizando a velocidade do barco anterior com a do novo barco anterior
-        temBarco = False   
+        block = random.choice(['grass', 'water', 'rails', 'grass', 'rails', 'grass', 'water', 'rails']) #opções das sprites que podem ser escolhidas inicialmete, algumas possuem mais chances de serem escolhidas
+        if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de water ou rails, e sim sobre um bloco de grass
+            block = 'grass'
+
+        direction = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
+        speed = random.randint(1, 8)
+        
+        # garantir que ao menos um obstaculo/boat seja gerado
+        gerouObstaculo = False
         for i in range(10):
-            if block == 'grama':Grama(i * 50 + 25, y, self.player)
-            elif block == 'agua':Agua(i * 50 + 25, y, self.player)
-            elif block == 'trilho':Trilho(i * 50 + 25, y, self.player)
-            if block == 'agua' and random.randint(0, (10-self.opcoes['NBarcos'])) == 0:
-                Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
-                temBarco = True
-            elif not temBarco and i == 9 and block == 'agua':
-                Barco(i * 50 + 25, y, self.player, speedbarco, direcao)
-            if block == 'trilho' and random.randint(0, (10-self.opcoes['NMinecarts'])) == 0:Minecart(i * 50 + 25, y, self.player, speedcart, direcao)
+            if block == 'water': Water(self.player, i * 50 + 25, y)
+            if block == 'rails': Rails(self.player, i * 50 +25, y)
+            elif block == 'grass': Grass(self.player, i * 50 +25, y)
+
+        for i in range(10):
+            if block == 'water' and random.random() < 0.25:
+                Boat(self.player, i * 50 + 25, y, speed*direction)
+                gerouObstaculo = True
+            if block == 'rails' and random.random() < 0.25:
+                Minecart(self.player, i * 50 + 25, y, speed*direction)
+                gerouObstaculo = True
+            if not gerouObstaculo and i == 5:
+                if block == 'water':
+                    Boat(self.player, i * 50 + 25, y, speed*direction)
+                elif block == 'rails':
+                    Minecart(self.player, i * 50 + 25, y, speed*direction)
     def salvar_highscore(self):     #salvando a pontuação do jogador
         if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.player.score)
@@ -126,7 +126,7 @@ class TelaJogo:
                 f.write(string)
                 print(string)
     def update(self):       #função para atualizar a tela
-        if self.y >= int(50/self.player.velocidade): # Gerar uma nova fileira em cima
+        if self.y >= int(50/self.player.speed): # Gerar uma nova fileira em cima
             self.nova_fileira()
             self.y = 0
         self.y += 1
@@ -135,30 +135,28 @@ class TelaJogo:
                 return False
         self.player.update()
         self.clock.tick(30)
-        if self.player.score >= 200: # caso o jogador tenha mais de 200 pontos, as sprites mudam para o end
-            sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/endstone.png'), (50, 50))
-            sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/trilhoEnd.png'), (50, 50))
-            sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/void.png'), (50, 50))
-            sprites['barco'] = pygame.transform.scale(pygame.image.load('assets/sprites/elitra.png'), (50, 50))
-        elif self.player.score >= 100: # caso o jogador tenha mais de 100 pontos, as sprites mudam para o nether
-            sprites['grama'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
-            sprites['trilho'] = pygame.transform.scale(pygame.image.load('assets/sprites/rail.png'), (50, 50))
-            sprites['agua'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
+        if self.player.score >= 100: # caso o jogador tenha mais de 200 pontos, as sprites mudam para o end
+            sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/endstone.png'), (50, 50))
+            sprites['rails'] = pygame.transform.scale(pygame.image.load('assets/sprites/railsEnd.png'), (50, 50))
+            sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/void.png'), (50, 50))
+            sprites['boat'] = pygame.transform.scale(pygame.image.load('assets/sprites/elitra.png'), (50, 50))
+        elif self.player.score >= 50: # caso o jogador tenha mais de 100 pontos, as sprites mudam para o nether
+            sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
+            sprites['rails'] = pygame.transform.scale(pygame.image.load('assets/sprites/railsNether.png'), (50, 50))
+            sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
         return True
     
     def desenha(self):      #desenhando a pontuação e a quantidade de vidas do jogador
         self.tela.fill((255, 255, 255))
-        for i in self.player.blocos: 
-            self.tela.blit(i.image, i.rect)
-        for i in self.player.obstaculos:
+        for i in self.player.entities:
             self.tela.blit(i.image, i.rect)
         self.tela.blit(self.player.image, self.player.rect)
         t = "pontuacao: " + str(self.player.score)
         textoVidas = self.fonte2.render(str(self.player.vidas), True, (255, 255, 255))
         self.tela.blit(textoVidas, (20, 10))
         self.tela.blit(sprites['coracao'], (50, 10))
-        texto = self.fonte.render(t, True, (255, 255, 255))
-        self.tela.blit(texto, (300, 10))
+        text = self.fonte.render(t, True, (255, 255, 255))
+        self.tela.blit(text, (300, 10))
         pygame.display.update()
     
     def troca_tela(self):
@@ -190,8 +188,8 @@ class TelaRanking():
         self.tela.blit(texto1, (0, 0))
         for i in range(len(self.ranking)): #escrevendo as pontuações na tela
             nome, score = self.ranking[i]
-            texto = self.fonte.render(str(i+1)+'. '+nome+' - '+str(score), True, (255, 255, 255))
-            self.tela.blit(texto, (100, 100+i*50))
+            text = self.fonte.render(str(i+1)+'. '+nome+' - '+str(score), True, (255, 255, 255))
+            self.tela.blit(text, (100, 100+i*50))
         pygame.display.update()
 
     def update(self):
@@ -208,17 +206,16 @@ class TelaRanking():
             return TelaInicial(self.tela)
         else:
             return self
-        
+
 # criando classe da tela de opções
 class TelaOptions():
     def __init__(self, tela):
         #criando os botoes 
         self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30), False, False
-        self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaoVelocidade', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
-        self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
-
+        self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaospeed', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
+        self.opcoes = {'Vidas': 1,'speed': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
         #posiciona botoes
-        for x, y, name in [(250, 300, 'botaoNBarcos'), (250, 350, 'botaoNMinecarts'), (250, 250, 'botaoVelocidade'), (150, 500, 'botaoEfeitos'), (350, 500, 'botaoMusica'), (250, 400, 'botaoVB'), (250, 450, 'botaoVM'), (400, 640, 'botaoVoltar'), (250, 130, 'botaoJogar'), (250, 200, 'botaoVidas')]:
+        for x, y, name in [(250, 300, 'botaoNBarcos'), (250, 350, 'botaoNMinecarts'), (250, 250, 'botaospeed'), (150, 500, 'botaoEfeitos'), (350, 500, 'botaoMusica'), (250, 400, 'botaoVB'), (250, 450, 'botaoVM'), (400, 640, 'botaoVoltar'), (250, 130, 'botaoJogar'), (250, 200, 'botaoVidas')]:
             for n in (name if isinstance(name, list) else [name]):
                 self.botoes[n].centerx, self.botoes[n].centery = x, y
 
@@ -227,8 +224,9 @@ class TelaOptions():
         self.tela.blit(self.fundo, (0,0))   #colocando imgaem de fundo
         [self.tela.blit(sprites[name], self.botoes[name]) for name in self.botoes.keys()]   #colocando os botões
         for i in range(6):
-            texto = self.fonte.render(str(list(self.opcoes.values())[i]), True, (210, 210, 210))
-            self.tela.blit(texto, (400, 187+i*50))
+            text = self.fonte.render(str(list(self.opcoes.values())[i]), True, (210, 210, 210))
+            self.tela.blit(text, (400, 187+i*50))
+
         pygame.display.update()
 
     def update(self):
@@ -239,7 +237,7 @@ class TelaOptions():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for name in self.botoes.keys():
                     if self.botoes[name].collidepoint(event.pos):
-                        if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
+                        if name in ['botaospeed', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
                             efeitos_sonoros['click_som'].play()
                             self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1   #aumentando a quantidade de cada categoria de opção
                         elif name == 'botaoEfeitos': #pausando ou não os efeitos sonoros
@@ -274,8 +272,8 @@ class TelaTutorial():
     
     def desenha(self):
         self.tela.blit(self.fundo, (0,0))   #colocando a sprite de fundo
-        texto = self.fonte.render('voltar', True, (255, 255, 255))
-        self.tela.blit(texto, (200, 700))   # colocando o botã de voltar
+        text = self.fonte.render('voltar', True, (255, 255, 255))
+        self.tela.blit(text, (200, 700))   # colocando o botã de voltar
 
     def update(self):
         pygame.display.update()
