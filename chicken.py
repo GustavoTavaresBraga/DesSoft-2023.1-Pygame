@@ -2,178 +2,169 @@
 import pygame
 from sprites import sprites, efeitos_sonoros
 
-import pygame
 
 class Entity(pygame.sprite.Sprite):
-    def __init__(self, player, x, y, entity_type, speedX=0):
+    def __init__(self, world, x, y, entity_type, speedX=0):
+        self.world = world
         pygame.sprite.Sprite.__init__(self)
         self.entity_type = entity_type
         self.speedX = speedX
         self.image = self.get_image(speedX)
         self.rect = self.image.get_rect(centerx=x, bottom=y)
-        self.player = player
-        self.player.entities.append(self)
-
     def get_image(self, speedX):
         if speedX <= 0:
             return sprites[self.entity_type]
         else:
             return pygame.transform.flip(sprites[self.entity_type], True, False)
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
 
     def update(self):
-        self.rect.bottom += self.player.speed
+        self.rect.bottom += self.world.speed
 
 class Boat(Entity):
-    def __init__(self, player, x, y, speedX=0):
-        super().__init__(player, x, y, 'boat', speedX)
+    def __init__(self, world, x, y, speedX=0):
+        super().__init__(world, x, y, 'boat', speedX)
         self.type = 'boat'
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.centerx < -50 and self.speedX < 0:
-            self.rect.centerx = 550
-        elif self.rect.centerx > 550 and self.speedX > 0:
-            self.rect.centerx = -50
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
 
 class Minecart(Entity):
-    def __init__(self, player, x, y, speedX=0):
-        super().__init__(player, x, y, 'minecart', speedX)
+    def __init__(self,world, x, y, speedX=0):
+        super().__init__( world, x, y, 'minecart', speedX)
         self.type = 'minecart'
 
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.centerx < -50 and self.speedX < 0:
-            self.rect.centerx = 550
-        elif self.rect.centerx > 550 and self.speedX > 0:
-            self.rect.centerx = -50
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
 
 class Water(Entity):
-    def __init__(self, player, x, y):
-        super().__init__(player, x, y, 'water')
+    def __init__(self,world, x, y):
+        super().__init__( world,x, y, 'water')
         self.type = 'water'
 
 class Grass(Entity):
-    def __init__(self, player, x, y):
-        super().__init__(player, x, y, 'grass')
+    def __init__(self,world, x, y):
+        super().__init__(world, x, y, 'grass')
         self.type = 'grass'
 
 class Rails(Entity):
-    def __init__(self, player, x, y):
-        super().__init__(player, x, y, 'rails')
+    def __init__(self,world,  x, y):
+        super().__init__(world, x, y, 'rails')
         self.type = 'rails'
 
 
 # Cria a classe do jogador
-class Player():
-    def __init__(self, speed = 2, vidas = 3):
+class Player(Entity):
+    def __init__(self, world):
         pygame.sprite.Sprite.__init__(self)
-        self.original_image = sprites['chicken']
-        self.rect = pygame.Rect(0, 0, 40, 40)
-        self.rect.centerx = 500 / 2
-        self.rect.bottom = 690
+        super().__init__(world, 250, 690, 'chicken')
+
+        self.rect = pygame.Rect(230,650,40,40)
+        self.image = sprites['chicken']
+        self.red_image = sprites['chickenRed']
         self.movement = None
-        self.image = self.original_image.copy()
         self.moveu = 0
         self.onBoat = False
-        self.vidas = vidas
+        self.vidas = 3
         self.speedBoat = 0
         self.score = 0
-        self.entities = []
-        self.speed = speed
+        self.speed = 2
         self.immunity = 0
         self.morreu = False
-
+        self.world = world
     # Cria a função update para atualizar a posição do jogador
     def update(self):
+        super().update()
         # nomeando as direções do jogador baseado na seta em que o usuario aperta ou segura
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50: self.movement = 'cima'
-        if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750: self.movement = 'baixo'
-        if keys[pygame.K_LEFT] and self.movement is None and self.rect.centerx >= 50: self.movement = 'esquerda'
-        if keys[pygame.K_RIGHT] and self.movement is None and self.rect.centerx <= 450: self.movement = 'direita'
-       
-        if self.onBoat:        #condição para o jogador se movimentar junto com o barco
-            self.rect.centerx += self.speedBoat
-
-            # easteregg para o jogador dar a volta na tela
-            # if self.rect.centerx < -25:
-            #     self.rect.centerx = 525
-            # if self.rect.centerx > 525:
-            #     self.rect.centerx = -25
-
+        if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50 and self.rect.right > 10 and self.rect.left<490: self.movement = 'cima'
+        if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750 and self.rect.right > 10 and self.rect.left<490: self.movement = 'baixo'
+        if keys[pygame.K_LEFT] and self.movement is None: self.movement = 'esquerda'
+        if keys[pygame.K_RIGHT] and self.movement is None: self.movement = 'direita'
+        self.rect.centerx += self.speedBoat
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
             self.rect.y -= 10
-            self.moveu +=1
-            if self.moveu == 5:
-                self.movement = None
-                self.moveu = 0
-                self.score += 1
         if self.movement == 'baixo':
             self.rect.y += 10
-            self.moveu +=1
-            if self.moveu == 5:
-                self.movement = None
-                self.moveu = 0
-                self.score -= 1
-        if self.movement == 'esquerda':
+        if self.movement == 'esquerda' and self.rect.left > 10:
             self.rect.x -= 10
-            self.moveu +=1
-            if self.moveu == 5:
-                self.movement = None
-                self.moveu = 0
-        if self.movement == 'direita':
+        if self.movement == 'direita' and self.rect.right < 490:
             self.rect.x += 10
-            self.moveu +=1
-            if self.moveu > 5:
-                self.movement = None
-                self.moveu = 0
+        if not self.movement is None:
+            self.moveu += 1
+        if self.moveu == 5:
+            if self.movement == 'cima':
+                self.score += 1
+            elif self.movement == 'baixo':
+                self.score -= 1
+            self.movement = None
+            self.moveu = 0
+        
         if self.movement == None:
+            self.onBoat = self.noBarco()
             if self.checarMorte():
                 self.morreu = True
         #conferir estado
-        for i in self.entities:
-            i.update()
-            if i.rect.bottom > 850:
-                self.entities.remove(i)
         self.immunity -= 1
-        self.rect.bottom += self.speed # Mexer a galinha pra baixo
-
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
+        
     # Confere se o jogador morreu
+    def noBarco(self):
+        clossest = 1000
+        for i in self.world.getEntities():
+            if i.entity_type != 'boat':
+                continue
+            if i.rect.colliderect(self.rect):
+                distanceToBoat = abs(i.rect.centerx - self.rect.centerx)
+                if distanceToBoat < clossest:
+                    clossest = distanceToBoat
+                    boat = i
+        if clossest < 40:
+            self.speedBoat = boat.speedX
+            self.rect.centerx = boat.rect.centerx
+            return True
+        self.speedBoat = 0
+        return False
     def checarMorte(self):
-        if self.vidas <= 0:     #conferindo se morreu pela falta de vidas
-                return True
         if self.rect.bottom > 840:      #conferindo se morreu porque a galinha foi mais devagar do que a screen e sumiu 
             efeitos_sonoros['morte_som'].play()     #som de morte da galinha
             return True
-        self.onBoat = False
-        for i in self.entities:
-            # Conferindo se a galinha colidiu sem estar imune, o que a faz perder uma vida e recber immunity por um curto tempo
-            if i.rect.colliderect(self.rect) and i.type == 'minecart' and self.immunity <= 0:
+        for i in self.world.getEntities():
+            if i.entity_type != 'minecart':
+                continue
+            if i.rect.colliderect(self.rect) and self.immunity <= 0:
                 self.vidas -= 1
                 efeitos_sonoros['morte_som'].play()
                 self.immunity = 50
-            if i.rect.colliderect(self.rect) and i.type == 'boat':
-                self.onBoat = True
-                self.rect.centerx = i.rect.centerx
-                # change boat color
-                self.speedBoat = i.speedX
-        for i in self.entities:
-            # Conferindo se a galinha se afougou sem estar imune, o que a faz perder uma vida e recber immunity por um curto tempo
-            if i.rect.colliderect(self.rect) and i.type == 'water':
-                if not self.onBoat and self.immunity <= 0:
-                    self.vidas -= 1
-                    efeitos_sonoros['morte_som'].play()
-                    self.immunity = 50
-        if self.immunity > 25:
-            # fazendo a galinha ficar vermelha, para ilustrar que ela sofreu dano/perdeu uma vida
-            tint = pygame.Surface(self.image.get_size()).convert_alpha()
-            tint.fill((255, 0, 0))
-            self.image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        else:
-            self.image.blit(self.original_image, (0, 0))
+        for i in self.world.getEntities():
+            if i.entity_type != 'water':
+                continue
+            if i.rect.colliderect(self.rect) and not self.onBoat and self.immunity <= 0:
+                self.vidas -= 1
+                efeitos_sonoros['morte_som'].play()
+                self.immunity = 50
+        if self.vidas <= 0:     #conferindo se morreu pela falta de vidas
+            return True
         return False
+    def draw(self, screen):
+        if self.immunity > 0:
+            screen.blit(self.red_image, self.rect)
+        else:
+            screen.blit(self.image, self.rect)
 
 # Cria a classe da caixa de text
 class TextBox():

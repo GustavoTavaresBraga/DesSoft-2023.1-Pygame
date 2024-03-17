@@ -9,6 +9,7 @@ sprites = {
     'boat': pygame.transform.scale(pygame.image.load('assets/sprites/boat.png'), (50, 50)),
     'minecart': pygame.transform.scale(pygame.image.load('assets/sprites/minecart.png'), (50, 50)),
     'chicken':pygame.transform.scale(pygame.image.load('assets/sprites/chicken.png'), (50, 50)),
+    'chickenRed':pygame.transform.scale(pygame.image.load('assets/sprites/chickenRed.png'), (50, 50)),
     'botaoVelocidade':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVelocidade.png'), (400, 40)),
     'botaoNBarcos':pygame.transform.scale(pygame.image.load('assets/sprites/botaoNBarcos.png'), (400, 40)),
     'botaoNMinecarts':pygame.transform.scale(pygame.image.load('assets/sprites/botaoNMinecarts.png'), (400, 40)),
