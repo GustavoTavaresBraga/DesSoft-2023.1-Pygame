@@ -45,7 +45,7 @@ class TelaInicial():
                     self.ranking = True
                     efeitos_sonoros['click_som'].play()
                 elif self.botaoOptions.collidepoint(mouse_x, mouse_y):
-                    #self.options = True 
+                    self.options = True 
                     efeitos_sonoros['click_som'].play()
                 elif self.botaoTutorial.collidepoint(mouse_x, mouse_y):
                     self.tutorial = True

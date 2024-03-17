@@ -29,10 +29,10 @@ class Boat(Entity):
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.centerx < -50 and self.speedX < 0:
-            self.rect.centerx = 550
-        elif self.rect.centerx > 550 and self.speedX > 0:
-            self.rect.centerx = -50
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
 
 class Minecart(Entity):
     def __init__(self,world, x, y, speedX=0):
@@ -42,10 +42,10 @@ class Minecart(Entity):
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.centerx < -50 and self.speedX < 0:
-            self.rect.centerx = 550
-        elif self.rect.centerx > 550 and self.speedX > 0:
-            self.rect.centerx = -50
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
 
 class Water(Entity):
     def __init__(self,world, x, y):
@@ -75,7 +75,7 @@ class Player(Entity):
         self.movement = None
         self.moveu = 0
         self.onBoat = False
-        self.vidas = 10
+        self.vidas = 3
         self.speedBoat = 0
         self.score = 0
         self.speed = 2
@@ -87,8 +87,8 @@ class Player(Entity):
         super().update()
         # nomeando as direções do jogador baseado na seta em que o usuario aperta ou segura
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50: self.movement = 'cima'
-        if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750: self.movement = 'baixo'
+        if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50 and self.rect.right > 10 and self.rect.left<490: self.movement = 'cima'
+        if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750 and self.rect.right > 10 and self.rect.left<490: self.movement = 'baixo'
         if keys[pygame.K_LEFT] and self.movement is None and self.rect.centerx >= 50: self.movement = 'esquerda'
         if keys[pygame.K_RIGHT] and self.movement is None and self.rect.centerx <= 450: self.movement = 'direita'
         self.rect.centerx += self.speedBoat
@@ -117,6 +117,10 @@ class Player(Entity):
                 self.morreu = True
         #conferir estado
         self.immunity -= 1
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
         
     # Confere se o jogador morreu
     def noBarco(self):
@@ -139,8 +143,6 @@ class Player(Entity):
         if self.rect.bottom > 840:      #conferindo se morreu porque a galinha foi mais devagar do que a screen e sumiu 
             efeitos_sonoros['morte_som'].play()     #som de morte da galinha
             return True
-        if self.rect.centerx < -25 or self.rect.centerx > 525:
-                return True
         for i in self.world.getEntities():
             if i.entity_type != 'minecart':
                 continue

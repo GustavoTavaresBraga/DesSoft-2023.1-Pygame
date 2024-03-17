@@ -11,6 +11,7 @@ class World:
         self.screen = screen
         self.speed = 2
         self.y = 0
+        self.previousSpeed = 0
         for i in range(17):
             self.generate(y=800-(i*50))
     def draw(self):
@@ -50,7 +51,11 @@ class Biome:
         row = []
         block = random.choices(['grass', 'water', 'rails'], self.weights)[0] #opções das sprites que podem ser escolhidas inicialmete, algumas possuem mais chances de serem escolhidas
         direction = random.choice([1, -1])    #escolhendo aleatoriamente a direção dos barcos e carrinhos
+         #garantir que a direção dos barcos e carrinhos não seja a mesma que a anterior
         speed = random.randint(self.speeds[0], self.speeds[1])
+        while abs(self.world.previousSpeed- speed*direction) < 2:
+            speed = random.randint(self.speeds[0], self.speeds[1])
+            self.world.previousSpeed = speed*direction
         if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de water ou rails, e sim sobre um bloco de grass
             block = 'grass'
         # garantir que ao menos um obstaculo/boat seja gerado
