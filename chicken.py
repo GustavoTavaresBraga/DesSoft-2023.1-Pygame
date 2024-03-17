@@ -89,17 +89,17 @@ class Player(Entity):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50 and self.rect.right > 10 and self.rect.left<490: self.movement = 'cima'
         if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750 and self.rect.right > 10 and self.rect.left<490: self.movement = 'baixo'
-        if keys[pygame.K_LEFT] and self.movement is None and self.rect.centerx >= 50: self.movement = 'esquerda'
-        if keys[pygame.K_RIGHT] and self.movement is None and self.rect.centerx <= 450: self.movement = 'direita'
+        if keys[pygame.K_LEFT] and self.movement is None: self.movement = 'esquerda'
+        if keys[pygame.K_RIGHT] and self.movement is None: self.movement = 'direita'
         self.rect.centerx += self.speedBoat
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
             self.rect.y -= 10
         if self.movement == 'baixo':
             self.rect.y += 10
-        if self.movement == 'esquerda':
+        if self.movement == 'esquerda' and self.rect.left > 10:
             self.rect.x -= 10
-        if self.movement == 'direita':
+        if self.movement == 'direita' and self.rect.right < 490:
             self.rect.x += 10
         if not self.movement is None:
             self.moveu += 1

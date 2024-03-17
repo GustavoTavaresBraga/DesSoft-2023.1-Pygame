@@ -117,8 +117,11 @@ class TelaRanking():
         self.fundo = sprites['ranking']
         with open('assets/scores.csv', 'r') as scores: #lendo o arquivo de pontuações
             for line in scores:
-                nome, score = line.split(',')
-                self.ranking[nome] = int(score)
+                try:
+                    nome, score = line.split(',')
+                    self.ranking[nome] = int(score)
+                except:
+                    pass
         self.ranking = sorted(self.ranking.items(), key=lambda x: x[1], reverse=True) #ordenando as pontuações
         self.fonte  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30) 
         self.botaoSair = pygame.Rect(0, 0, 100, 50)

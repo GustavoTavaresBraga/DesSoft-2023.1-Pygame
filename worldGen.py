@@ -55,7 +55,8 @@ class Biome:
         speed = random.randint(self.speeds[0], self.speeds[1])
         while abs(self.world.previousSpeed- speed*direction) < 2:
             speed = random.randint(self.speeds[0], self.speeds[1])
-            self.world.previousSpeed = speed*direction
+        self.world.previousSpeed = speed*direction
+        
         if y > 500 and y <850:  #condição para o jogador não nascer em cima de uma sprite de water ou rails, e sim sobre um bloco de grass
             block = 'grass'
         # garantir que ao menos um obstaculo/boat seja gerado
