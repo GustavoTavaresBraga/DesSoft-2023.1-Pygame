@@ -18,34 +18,24 @@ class Entity(pygame.sprite.Sprite):
             return pygame.transform.flip(sprites[self.entity_type], True, False)
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-
     def update(self):
         self.rect.bottom += self.world.speed
+        self.rect.centerx += self.speedX
+        if self.rect.right < -20:
+            self.rect.left = 520
+        if self.rect.left > 520:
+            self.rect.right = -20
 
 class Boat(Entity):
     def __init__(self, world, x, y, speedX=0):
         super().__init__(world, x, y, 'boat', speedX)
         self.type = 'boat'
-    def update(self):
-        super().update()
-        self.rect.centerx += self.speedX
-        if self.rect.right < -20:
-            self.rect.left = 520
-        if self.rect.left > 520:
-            self.rect.right = -20
+
 
 class Minecart(Entity):
     def __init__(self,world, x, y, speedX=0):
         super().__init__( world, x, y, 'minecart', speedX)
         self.type = 'minecart'
-
-    def update(self):
-        super().update()
-        self.rect.centerx += self.speedX
-        if self.rect.right < -20:
-            self.rect.left = 520
-        if self.rect.left > 520:
-            self.rect.right = -20
 
 class Water(Entity):
     def __init__(self,world, x, y):
