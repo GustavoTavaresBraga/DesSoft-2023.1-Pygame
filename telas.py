@@ -97,6 +97,8 @@ class TelaJogo:
         textoVidas = self.fonte2.render(str(self.world.player.vidas), True, (255, 255, 255))
         self.tela.blit(textoVidas, (20, 10))
         self.tela.blit(sprites['coracao'], (50, 10))
+        # show fps
+        
         text = self.fonte.render(t, True, (255, 255, 255))
         self.tela.blit(text, (300, 10))
         pygame.display.update()

@@ -94,6 +94,7 @@ class Player(Entity):
         self.rect.centerx += self.speedBoat
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
+            self.speedBoat = 0
             self.rect.y -= 10
         if self.movement == 'baixo':
             self.rect.y += 10
@@ -112,7 +113,7 @@ class Player(Entity):
             self.moveu = 0
         
         if self.movement == None:
-            self.onBoat = self.noBarco()
+            self.land()
             if self.checarMorte():
                 self.morreu = True
         #conferir estado
@@ -122,11 +123,16 @@ class Player(Entity):
         if self.rect.left > 520:
             self.rect.right = -20
         
+
     # Confere se o jogador morreu
-    def noBarco(self):
+    def land(self):
         clossest = 1000
+        # self.biome is the last biome the players score is greater than the biome score
+        for score, biome in self.world.biomes.items():
+            if self.score >= score:
+                self.biome = biome(self.world)
         for i in self.world.getEntities():
-            if i.entity_type != 'boat':
+            if not i.entity_type in self.biome.stickTo:
                 continue
             if i.rect.colliderect(self.rect):
                 distanceToBoat = abs(i.rect.centerx - self.rect.centerx)
@@ -136,13 +142,21 @@ class Player(Entity):
         if clossest < 40:
             self.speedBoat = boat.speedX
             self.rect.centerx = boat.rect.centerx
-            return True
+            self.onBoat = True
+            return
         self.speedBoat = 0
-        return False
+        self.onBoat = False
     def checarMorte(self):
         if self.rect.bottom > 840:      #conferindo se morreu porque a galinha foi mais devagar do que a screen e sumiu 
             efeitos_sonoros['morte_som'].play()     #som de morte da galinha
             return True
+        if self.biome.biomeName == 'end':  
+            for i in self.world.getEntities():
+                if i.entity_type != 'water':
+                    continue
+                if i.rect.colliderect(self.rect) and not self.onBoat:
+                    return True
+            return False
         for i in self.world.getEntities():
             if i.entity_type != 'minecart':
                 continue
@@ -161,10 +175,12 @@ class Player(Entity):
             return True
         return False
     def draw(self, screen):
+        rect = self.rect.copy()
+        rect.x -= 5
         if self.immunity > 0:
-            screen.blit(self.red_image, self.rect)
+            screen.blit(self.red_image, rect)
         else:
-            screen.blit(self.image, self.rect)
+            screen.blit(self.image, rect)
 
 # Cria a classe da caixa de text
 class TextBox():
