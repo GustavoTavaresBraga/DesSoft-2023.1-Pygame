@@ -8,7 +8,7 @@ class Entity(pygame.sprite.Sprite):
         self.world = world
         pygame.sprite.Sprite.__init__(self)
         self.entity_type = entity_type
-        self.speedX = speedX
+        self.speedX = speedX/2
         self.image = self.get_image(speedX)
         self.rect = self.image.get_rect(centerx=x, bottom=y)
     def get_image(self, speedX):
@@ -78,7 +78,6 @@ class Player(Entity):
         self.vidas = 3
         self.speedBoat = 0
         self.score = 0
-        self.speed = 2
         self.immunity = 0
         self.morreu = False
         self.world = world
@@ -95,16 +94,16 @@ class Player(Entity):
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
             self.speedBoat = 0
-            self.rect.y -= 10
+            self.rect.y -= 5
         if self.movement == 'baixo':
-            self.rect.y += 10
+            self.rect.y += 5
         if self.movement == 'esquerda' and self.rect.left > 10:
-            self.rect.x -= 10
+            self.rect.x -= 5
         if self.movement == 'direita' and self.rect.right < 490:
-            self.rect.x += 10
+            self.rect.x += 5
         if not self.movement is None:
             self.moveu += 1
-        if self.moveu == 5:
+        if self.moveu == 10:
             if self.movement == 'cima':
                 self.score += 1
             elif self.movement == 'baixo':

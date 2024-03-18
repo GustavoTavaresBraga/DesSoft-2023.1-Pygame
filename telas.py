@@ -87,7 +87,7 @@ class TelaJogo:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-        self.clock.tick(30)
+        self.clock.tick(60)
         return True
     
     def desenha(self):      #desenhando a pontuação e a quantidade de vidas do jogador
@@ -98,7 +98,8 @@ class TelaJogo:
         self.tela.blit(textoVidas, (20, 10))
         self.tela.blit(sprites['coracao'], (50, 10))
         # show fps
-        
+        fpsText = self.fonte.render(str(int(self.clock.get_fps())), True, (255, 255, 255))
+        self.tela.blit(fpsText, (10, 700))
         text = self.fonte.render(t, True, (255, 255, 255))
         self.tela.blit(text, (300, 10))
         pygame.display.update()

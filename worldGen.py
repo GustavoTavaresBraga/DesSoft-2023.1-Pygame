@@ -6,14 +6,13 @@ class World:
         self.player = Player(self)
         self.entities = []
         self.screen = screen
-        self.speed = 2
+        self.speed = 1
         self.y = 0
         self.previousSpeed = 0
         self.biomes = {
             0: Plains,
             50: Nether,
             100: End
-
         }
         self.currentBiome = self.biomes[0](self)
         self.currentBiome.load_sprites()
