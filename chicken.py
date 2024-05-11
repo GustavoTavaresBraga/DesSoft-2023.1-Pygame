@@ -21,10 +21,10 @@ class Entity(pygame.sprite.Sprite):
     def update(self):
         self.rect.bottom += self.world.speed
         self.rect.centerx += self.speedX
-        if self.rect.right < -20:
-            self.rect.left = 520
-        if self.rect.left > 520:
-            self.rect.right = -20
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
 
 class Boat(Entity):
     def __init__(self, world, x, y, speedX=0):
