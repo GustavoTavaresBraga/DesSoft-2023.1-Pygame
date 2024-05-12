@@ -3,41 +3,44 @@ from sprites import *
 import random
 class World:
     def __init__(self,screen):
-       
         self.player = Player(self)
         self.entities = []
-        self.currentBiome = Plains(self)
-        self.score = 0
         self.screen = screen
-        self.speed = 2
+        self.speed = 1
         self.y = 0
         self.previousSpeed = 0
-        for i in range(17):
+        self.biomes = {
+            0: Plains,
+            100: Nether,
+            250: NetherHard,
+            500: End
+        }
+        self.currentBiome = self.biomes[0](self)
+        self.currentBiome.load_sprites()
+        for i in range(16):
             self.generate(y=800-(i*50))
     def draw(self):
         for entity in self.entities:
-            if entity.entity_type == 'boat' or entity.entity_type == 'minecart':
+            if entity.entity_type == 'boat' or entity.entity_type == 'minecart' or entity.entity_type == 'heart':
                 continue
             entity.draw(self.screen)
         for entity in self.entities:
-            if entity.entity_type == 'boat' or entity.entity_type == 'minecart':
+            if entity.entity_type == 'boat' or entity.entity_type == 'minecart' or entity.entity_type == 'heart':
                 entity.draw(self.screen)
         self.player.draw(self.screen)
     def update(self):
-        if self.y >= int(50/self.speed): # Gerar uma nova fileira em cima
+        currentLayer = self.y/(50/self.speed)+14
+        if  currentLayer in self.biomes.keys():
+            self.currentBiome = self.biomes[currentLayer](self)
+            self.currentBiome.load_sprites()
+        if self.y%(50/self.speed) == 0: # Gerar uma nova fileira em cima
             self.generate()
-            self.y = 0
         self.y += 1
         for entity in self.entities:
             entity.update()
             if entity.rect.bottom >= 850:
                 self.entities.remove(entity)
         self.player.update()
-        if self.player.score == 100: # caso o jogador tenha mais de 200 pontos, as sprites mudam para o end
-            self.currentBiome = End(self)
-        elif self.player.score == 50: # caso o jogador tenha mais de 100 pontos, as sprites mudam para o nether
-            self.currentBiome = Nether(self)
-        
     def getEntities(self):
         return self.entities
     def generate(self, y=0):
@@ -47,6 +50,7 @@ class World:
 class Biome:
     def __init__(self, world):
         self.world = world
+        self.stickTo = ['boat']
     def new_row(self, y=0):
         row = []
         block = random.choices(['grass', 'water', 'rails'], self.weights)[0] #opções das sprites que podem ser escolhidas inicialmete, algumas possuem mais chances de serem escolhidas
@@ -67,15 +71,24 @@ class Biome:
                 if random.random() < self.boatChance or (i > 4 and not gerouObstaculo):
                     row.append(Boat(self.world, i * 50 + 25, y, speed*direction))
                     gerouObstaculo = True
-                
+                    if random.random() < self.heartChance:
+                        row.append(Heart(self.world, i * 50 + 25, y, speedX = speed*direction))
+                        print()
             elif block == 'rails': 
                 row.append(Rails(self.world, i * 50 +25, y))
                 if random.random() < self.minecartChance or (i > 8 and not gerouObstaculo):
                     row.append(Minecart(self.world, i * 50 + 25, y, speed*direction))
                     gerouObstaculo = True
-            elif block == 'grass': row.append(Grass(self.world, i * 50 +25, y))
+                elif random.random() < self.heartChance:
+                    row.append(Heart(self.world, i * 50 + 25, y))
+            elif block == 'grass': 
+                row.append(Grass(self.world, i * 50 +25, y))
+                if random.random() < self.heartChance:
+                    row.append(Heart(self.world, i * 50 + 25, y))
         return row
-        
+    def load_sprites(self):
+        for key, value in self.sprites.items():
+            sprites[key] = pygame.transform.scale(pygame.image.load('assets/sprites/'+value), (50, 50))
 
 class Plains(Biome):
     def __init__(self, world):
@@ -83,11 +96,16 @@ class Plains(Biome):
         self.weights = [5, 2, 3] # grass water rails
         self.boatChance = 0.35
         self.minecartChance = 0.25
+        self.heartChance = 0.005
         self.speeds = [2, 8]
-        sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/grass.png'), (50, 50))
-        sprites['rails'] = pygame.transform.scale(pygame.image.load('assets/sprites/rails.png'), (50, 50))
-        sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/water.png'), (50, 50))
-        sprites['boat'] = pygame.transform.scale(pygame.image.load('assets/sprites/boat.png'), (50, 50))
+        self.biomeName = 'plains'
+        self.sprites = {
+            'grass': 'grass.png',
+            'rails': 'rails.png',
+            'water': 'water.png',
+            'boat': 'boat.png'
+        }
+        
 
 class Nether(Biome):
     def __init__(self, world):
@@ -95,19 +113,52 @@ class Nether(Biome):
         self.weights = [4, 5,2] # grass water rails
         self.boatChance = 0.45
         self.minecartChance = 0.2
+        self.heartChance = 0.003
         self.speeds = [3, 6]
-        sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/netherack.png'), (50, 50))
-        sprites['rails'] = pygame.transform.scale(pygame.image.load('assets/sprites/railsNether.png'), (50, 50))
-        sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/lava.png'), (50, 50))
-
-
+        self.biomeName = 'nether'
+        self.sprites = {
+            'grass': 'netherack.png',
+            'rails': 'railsNether.png',
+            'water': 'lava.png',
+        }
+class NetherHard(Biome):
+    def __init__(self, world):
+        super().__init__(world)
+        self.weights = [3, 5,3] # grass water rails
+        self.boatChance = 0.4
+        self.minecartChance = 0.3
+        self.heartChance = 0.001
+        self.speeds = [4, 7]
+        self.biomeName = 'netherHard'
+        self.sprites = {
+            'grass': 'netherack.png',
+            'rails': 'railsNether.png',
+            'water': 'lava.png',
+        }
 class End(Biome):
     def __init__(self, world):
+        super().__init__(world)
         self.weights = [5, 5,0] # grass water rails
         self.boatChance = 0.2
         self.minecartChance = 0.2
         self.speeds = [6, 10]
-        super().__init__(world)
-        sprites['grass'] = pygame.transform.scale(pygame.image.load('assets/sprites/endstone.png'), (50, 50))
-        sprites['water'] = pygame.transform.scale(pygame.image.load('assets/sprites/void.png'), (50, 50))
-        sprites['boat'] = pygame.transform.scale(pygame.image.load('assets/sprites/elitra.png'), (50, 50))
+        self.stickTo = ['boat', 'grass']
+        self.biomeName = 'end'
+        self.sprites = {
+            'grass': 'endstone.png',
+            'water': 'void.png',
+            'boat': 'elitra.png'
+        }
+        self.previousRow =[]
+    def new_row(self, y=0):
+        row = super().new_row(y)
+        remove = random.choices(range(10), k=4)
+        while set(remove) == set(self.previousRow):
+            remove = random.choices(range(10), k=4)
+        self.previousRow = remove
+
+        for i in remove:
+            if row[i].entity_type == 'grass':
+                row[i].entity_type = 'water'
+                row[i].image = sprites['water']
+        return row

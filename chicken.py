@@ -8,7 +8,7 @@ class Entity(pygame.sprite.Sprite):
         self.world = world
         pygame.sprite.Sprite.__init__(self)
         self.entity_type = entity_type
-        self.speedX = speedX
+        self.speedX = speedX/2
         self.image = self.get_image(speedX)
         self.rect = self.image.get_rect(centerx=x, bottom=y)
     def get_image(self, speedX):
@@ -18,9 +18,9 @@ class Entity(pygame.sprite.Sprite):
             return pygame.transform.flip(sprites[self.entity_type], True, False)
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-
     def update(self):
         self.rect.bottom += self.world.speed
+
 
 class Boat(Entity):
     def __init__(self, world, x, y, speedX=0):
@@ -29,28 +29,29 @@ class Boat(Entity):
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.right < -20:
-            self.rect.left = 520
-        if self.rect.left > 520:
-            self.rect.right = -20
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
+
 
 class Minecart(Entity):
     def __init__(self,world, x, y, speedX=0):
         super().__init__( world, x, y, 'minecart', speedX)
         self.type = 'minecart'
-
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.right < -20:
-            self.rect.left = 520
-        if self.rect.left > 520:
-            self.rect.right = -20
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
 
 class Water(Entity):
     def __init__(self,world, x, y):
         super().__init__( world,x, y, 'water')
         self.type = 'water'
+    
 
 class Grass(Entity):
     def __init__(self,world, x, y):
@@ -61,6 +62,17 @@ class Rails(Entity):
     def __init__(self,world,  x, y):
         super().__init__(world, x, y, 'rails')
         self.type = 'rails'
+class Heart(Entity):
+    def __init__(self,world,  x, y, speedX=0):
+        super().__init__(world, x, y, 'heart', speedX)
+        self.type = 'heart'
+    def update(self):
+        super().update()
+        self.rect.centerx += self.speedX
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
 
 
 # Cria a classe do jogador
@@ -78,7 +90,6 @@ class Player(Entity):
         self.vidas = 3
         self.speedBoat = 0
         self.score = 0
-        self.speed = 2
         self.immunity = 0
         self.morreu = False
         self.world = world
@@ -94,16 +105,17 @@ class Player(Entity):
         self.rect.centerx += self.speedBoat
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':
-            self.rect.y -= 10
+            self.speedBoat = 0
+            self.rect.y -= 5
         if self.movement == 'baixo':
-            self.rect.y += 10
+            self.rect.y += 5
         if self.movement == 'esquerda' and self.rect.left > 10:
-            self.rect.x -= 10
+            self.rect.x -= 5
         if self.movement == 'direita' and self.rect.right < 490:
-            self.rect.x += 10
+            self.rect.x += 5
         if not self.movement is None:
             self.moveu += 1
-        if self.moveu == 5:
+        if self.moveu == 10:
             if self.movement == 'cima':
                 self.score += 1
             elif self.movement == 'baixo':
@@ -112,7 +124,7 @@ class Player(Entity):
             self.moveu = 0
         
         if self.movement == None:
-            self.onBoat = self.noBarco()
+            self.land()
             if self.checarMorte():
                 self.morreu = True
         #conferir estado
@@ -122,11 +134,16 @@ class Player(Entity):
         if self.rect.left > 520:
             self.rect.right = -20
         
+
     # Confere se o jogador morreu
-    def noBarco(self):
+    def land(self):
         clossest = 1000
+        # self.biome is the last biome the players score is greater than the biome score
+        for score, biome in self.world.biomes.items():
+            if self.score >= score:
+                self.biome = biome(self.world)
         for i in self.world.getEntities():
-            if i.entity_type != 'boat':
+            if not i.entity_type in self.biome.stickTo:
                 continue
             if i.rect.colliderect(self.rect):
                 distanceToBoat = abs(i.rect.centerx - self.rect.centerx)
@@ -136,14 +153,26 @@ class Player(Entity):
         if clossest < 40:
             self.speedBoat = boat.speedX
             self.rect.centerx = boat.rect.centerx
-            return True
+            self.onBoat = True
+            return
         self.speedBoat = 0
-        return False
+        self.onBoat = False
     def checarMorte(self):
         if self.rect.bottom > 840:      #conferindo se morreu porque a galinha foi mais devagar do que a screen e sumiu 
             efeitos_sonoros['morte_som'].play()     #som de morte da galinha
             return True
+        if self.biome.biomeName == 'end':  
+            for i in self.world.getEntities():
+                if i.entity_type != 'water':
+                    continue
+                if i.rect.colliderect(self.rect) and not self.onBoat:
+                    return True
+            return False
         for i in self.world.getEntities():
+            if i.entity_type == 'heart':
+                if i.rect.colliderect(self.rect):
+                    self.vidas += 1
+                    self.world.entities.remove(i)
             if i.entity_type != 'minecart':
                 continue
             if i.rect.colliderect(self.rect) and self.immunity <= 0:
@@ -161,10 +190,12 @@ class Player(Entity):
             return True
         return False
     def draw(self, screen):
+        rect = self.rect.copy()
+        rect.x -= 5
         if self.immunity > 0:
-            screen.blit(self.red_image, self.rect)
+            screen.blit(self.red_image, rect)
         else:
-            screen.blit(self.image, self.rect)
+            screen.blit(self.image, rect)
 
 # Cria a classe da caixa de text
 class TextBox():
