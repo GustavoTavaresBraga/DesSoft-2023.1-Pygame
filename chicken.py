@@ -20,27 +20,38 @@ class Entity(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
     def update(self):
         self.rect.bottom += self.world.speed
+
+
+class Boat(Entity):
+    def __init__(self, world, x, y, speedX=0):
+        super().__init__(world, x, y, 'boat', speedX)
+        self.type = 'boat'
+    def update(self):
+        super().update()
         self.rect.centerx += self.speedX
         if self.rect.right < -55:
             self.rect.left = 555
         if self.rect.left > 555:
             self.rect.right = -55
 
-class Boat(Entity):
-    def __init__(self, world, x, y, speedX=0):
-        super().__init__(world, x, y, 'boat', speedX)
-        self.type = 'boat'
-
 
 class Minecart(Entity):
     def __init__(self,world, x, y, speedX=0):
         super().__init__( world, x, y, 'minecart', speedX)
         self.type = 'minecart'
+    def update(self):
+        super().update()
+        self.rect.centerx += self.speedX
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
 
 class Water(Entity):
     def __init__(self,world, x, y):
         super().__init__( world,x, y, 'water')
         self.type = 'water'
+    
 
 class Grass(Entity):
     def __init__(self,world, x, y):
@@ -51,6 +62,17 @@ class Rails(Entity):
     def __init__(self,world,  x, y):
         super().__init__(world, x, y, 'rails')
         self.type = 'rails'
+class Heart(Entity):
+    def __init__(self,world,  x, y, speedX=0):
+        super().__init__(world, x, y, 'heart', speedX)
+        self.type = 'heart'
+    def update(self):
+        super().update()
+        self.rect.centerx += self.speedX
+        if self.rect.right < -55:
+            self.rect.left = 555
+        if self.rect.left > 555:
+            self.rect.right = -55
 
 
 # Cria a classe do jogador
@@ -147,6 +169,10 @@ class Player(Entity):
                     return True
             return False
         for i in self.world.getEntities():
+            if i.entity_type == 'heart':
+                if i.rect.colliderect(self.rect):
+                    self.vidas += 1
+                    self.world.entities.remove(i)
             if i.entity_type != 'minecart':
                 continue
             if i.rect.colliderect(self.rect) and self.immunity <= 0:

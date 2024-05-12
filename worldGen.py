@@ -11,8 +11,9 @@ class World:
         self.previousSpeed = 0
         self.biomes = {
             0: Plains,
-            50: Nether,
-            100: End
+            100: Nether,
+            250: NetherHard,
+            500: End
         }
         self.currentBiome = self.biomes[0](self)
         self.currentBiome.load_sprites()
@@ -20,11 +21,11 @@ class World:
             self.generate(y=800-(i*50))
     def draw(self):
         for entity in self.entities:
-            if entity.entity_type == 'boat' or entity.entity_type == 'minecart':
+            if entity.entity_type == 'boat' or entity.entity_type == 'minecart' or entity.entity_type == 'heart':
                 continue
             entity.draw(self.screen)
         for entity in self.entities:
-            if entity.entity_type == 'boat' or entity.entity_type == 'minecart':
+            if entity.entity_type == 'boat' or entity.entity_type == 'minecart' or entity.entity_type == 'heart':
                 entity.draw(self.screen)
         self.player.draw(self.screen)
     def update(self):
@@ -70,13 +71,20 @@ class Biome:
                 if random.random() < self.boatChance or (i > 4 and not gerouObstaculo):
                     row.append(Boat(self.world, i * 50 + 25, y, speed*direction))
                     gerouObstaculo = True
-                
+                    if random.random() < self.heartChance:
+                        row.append(Heart(self.world, i * 50 + 25, y, speedX = speed*direction))
+                        print()
             elif block == 'rails': 
                 row.append(Rails(self.world, i * 50 +25, y))
                 if random.random() < self.minecartChance or (i > 8 and not gerouObstaculo):
                     row.append(Minecart(self.world, i * 50 + 25, y, speed*direction))
                     gerouObstaculo = True
-            elif block == 'grass': row.append(Grass(self.world, i * 50 +25, y))
+                elif random.random() < self.heartChance:
+                    row.append(Heart(self.world, i * 50 + 25, y))
+            elif block == 'grass': 
+                row.append(Grass(self.world, i * 50 +25, y))
+                if random.random() < self.heartChance:
+                    row.append(Heart(self.world, i * 50 + 25, y))
         return row
     def load_sprites(self):
         for key, value in self.sprites.items():
@@ -88,6 +96,7 @@ class Plains(Biome):
         self.weights = [5, 2, 3] # grass water rails
         self.boatChance = 0.35
         self.minecartChance = 0.25
+        self.heartChance = 0.005
         self.speeds = [2, 8]
         self.biomeName = 'plains'
         self.sprites = {
@@ -104,6 +113,7 @@ class Nether(Biome):
         self.weights = [4, 5,2] # grass water rails
         self.boatChance = 0.45
         self.minecartChance = 0.2
+        self.heartChance = 0.003
         self.speeds = [3, 6]
         self.biomeName = 'nether'
         self.sprites = {
@@ -111,7 +121,20 @@ class Nether(Biome):
             'rails': 'railsNether.png',
             'water': 'lava.png',
         }
-
+class NetherHard(Biome):
+    def __init__(self, world):
+        super().__init__(world)
+        self.weights = [3, 5,3] # grass water rails
+        self.boatChance = 0.4
+        self.minecartChance = 0.3
+        self.heartChance = 0.001
+        self.speeds = [4, 7]
+        self.biomeName = 'netherHard'
+        self.sprites = {
+            'grass': 'netherack.png',
+            'rails': 'railsNether.png',
+            'water': 'lava.png',
+        }
 class End(Biome):
     def __init__(self, world):
         super().__init__(world)

@@ -24,6 +24,7 @@ sprites = {
     'botaoJogar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoJogar.png'), (200, 40)),
     'tutorial':pygame.transform.scale(pygame.image.load('assets/sprites/tutorial.png'), (500, 800)),
     'coracao':pygame.transform.scale(pygame.image.load('assets/sprites/coracao.png'), (35, 35)),
+    'heart':pygame.transform.scale(pygame.image.load('assets/sprites/heart.png'), (50, 50)),
 }
 #criando dicionario com todas as musicas, para facilitar chama-las nas funções
 efeitos_sonoros = {
