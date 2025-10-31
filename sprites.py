@@ -3,12 +3,13 @@ pygame.mixer.init()
 
 #criando dicionario com todas as sprites, para facilitar chama-las nas funções
 sprites = {
-    'grama': pygame.transform.scale(pygame.image.load('assets/sprites/grama.png'), (50, 50)),
-    'agua': pygame.transform.scale(pygame.image.load('assets/sprites/agua.png'), (50, 50)),
-    'trilho': pygame.transform.scale(pygame.image.load('assets/sprites/trilho.png'), (50, 50)),
-    'barco': pygame.transform.scale(pygame.image.load('assets/sprites/barco.png'), (50, 50)),
+    'grass': pygame.transform.scale(pygame.image.load('assets/sprites/grass.png'), (50, 50)),
+    'water': pygame.transform.scale(pygame.image.load('assets/sprites/water.png'), (50, 50)),
+    'rails': pygame.transform.scale(pygame.image.load('assets/sprites/rails.png'), (50, 50)),
+    'boat': pygame.transform.scale(pygame.image.load('assets/sprites/boat.png'), (50, 50)),
     'minecart': pygame.transform.scale(pygame.image.load('assets/sprites/minecart.png'), (50, 50)),
     'chicken':pygame.transform.scale(pygame.image.load('assets/sprites/chicken.png'), (50, 50)),
+    'chickenRed':pygame.transform.scale(pygame.image.load('assets/sprites/chickenRed.png'), (50, 50)),
     'botaoVelocidade':pygame.transform.scale(pygame.image.load('assets/sprites/botaoVelocidade.png'), (400, 40)),
     'botaoNBarcos':pygame.transform.scale(pygame.image.load('assets/sprites/botaoNBarcos.png'), (400, 40)),
     'botaoNMinecarts':pygame.transform.scale(pygame.image.load('assets/sprites/botaoNMinecarts.png'), (400, 40)),
@@ -23,6 +24,7 @@ sprites = {
     'botaoJogar':pygame.transform.scale(pygame.image.load('assets/sprites/botaoJogar.png'), (200, 40)),
     'tutorial':pygame.transform.scale(pygame.image.load('assets/sprites/tutorial.png'), (500, 800)),
     'coracao':pygame.transform.scale(pygame.image.load('assets/sprites/coracao.png'), (35, 35)),
+    'heart':pygame.transform.scale(pygame.image.load('assets/sprites/heart.png'), (50, 50)),
 }
 #criando dicionario com todas as musicas, para facilitar chama-las nas funções
 efeitos_sonoros = {

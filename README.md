@@ -1,6 +1,6 @@
 # DesSoft-2023.1-Pygame
 
-Autores: Gustavo Tavares Braga, Henrique Andrade Albuquerque, Rafa Curry Rayes
+Autores: Gustavo Tavares Braga, Henrique Andrade Albuquerque, Rafa Cury Rayes
 
 ## Projeto final do semestre de Design de Software
 Nome do jogo: Crossy Chicken.
