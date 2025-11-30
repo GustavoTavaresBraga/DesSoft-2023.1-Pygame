@@ -1,0 +1,8 @@
+[project]
+name = "dessoft-2023-1-pygame"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.3.5",
+    "pygame>=2.6.1",
+]

@@ -1,7 +1,6 @@
 import pygame
 from sprites import sprites, efeitos_sonoros, toggle_som
 from chicken import *
-global jogador
 from worldGen import World
 
 # criando classe para a tela inicial do jogo
@@ -69,14 +68,15 @@ class TelaInicial():
 
 #criando classe da tela do jogo
 class TelaJogo:
-    def __init__(self, tela, nome=''):
+    def __init__(self, tela, nome='', opcoes=None):
         self.tela = tela
         self.y = 0
         self.clock = pygame.time.Clock()
         self.fonte  = pygame.font.Font(None, 36)
         self.fonte2  = pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 40)
         self.nome = nome
-        self.world = World(self.tela)
+        self.opcoes = opcoes if opcoes else {'Vidas': 3, 'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2}
+        self.world = World(self.tela, self.opcoes)
     def salvar_highscore(self):     #salvando a pontuação do jogador
         if self.nome != '' and self.nome != 'escreva seu nome':
             string = '\n'+self.nome+','+str(self.world.player.score)
@@ -158,10 +158,10 @@ class TelaOptions():
     def __init__(self, tela):
         #criando os botoes 
         self.tela, self.fundo, self.fonte, self.voltar, self.play = tela, sprites['ranking'], pygame.font.Font('assets/MinecraftTen-VGORe.ttf', 30), False, False
-        self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaospeed', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
-        self.opcoes = {'Vidas': 1,'speed': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
+        self.botoes = {name: sprites[name].get_rect() for name in ['botaoVoltar', 'botaoJogar', 'botaoVelocidade', 'botaoMusica', 'botaoEfeitos', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']}
+        self.opcoes = {'Vidas': 1,'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2, 'Efeitos': True, 'Musica': True}
         #posiciona botoes
-        for x, y, name in [(250, 300, 'botaoNBarcos'), (250, 350, 'botaoNMinecarts'), (250, 250, 'botaospeed'), (150, 500, 'botaoEfeitos'), (350, 500, 'botaoMusica'), (250, 400, 'botaoVB'), (250, 450, 'botaoVM'), (400, 640, 'botaoVoltar'), (250, 130, 'botaoJogar'), (250, 200, 'botaoVidas')]:
+        for x, y, name in [(250, 300, 'botaoNBarcos'), (250, 350, 'botaoNMinecarts'), (250, 250, 'botaoVelocidade'), (150, 500, 'botaoEfeitos'), (350, 500, 'botaoMusica'), (250, 400, 'botaoVB'), (250, 450, 'botaoVM'), (400, 640, 'botaoVoltar'), (250, 130, 'botaoJogar'), (250, 200, 'botaoVidas')]:
             for n in (name if isinstance(name, list) else [name]):
                 self.botoes[n].centerx, self.botoes[n].centery = x, y
 
@@ -183,9 +183,11 @@ class TelaOptions():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for name in self.botoes.keys():
                     if self.botoes[name].collidepoint(event.pos):
-                        if name in ['botaospeed', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
+                        if name in ['botaoVelocidade', 'botaoNBarcos', 'botaoNMinecarts', 'botaoVidas', 'botaoVB', 'botaoVM']:
                             efeitos_sonoros['click_som'].play()
-                            self.opcoes[name[5:]] = self.opcoes[name[5:]] % 9 + 1   #aumentando a quantidade de cada categoria de opção
+                            # Map button name to option key (remove 'botao' prefix)
+                            option_key = name[5:]  # Remove 'botao' prefix
+                            self.opcoes[option_key] = self.opcoes[option_key] % 9 + 1   #aumentando a quantidade de cada categoria de opção
                         elif name == 'botaoEfeitos': #pausando ou não os efeitos sonoros
                             toggle_som()
                             efeitos_sonoros['click_som'].play()
@@ -193,8 +195,12 @@ class TelaOptions():
                             efeitos_sonoros['click_som'].play()
                             pygame.mixer.music.pause() if pygame.mixer.music.get_busy() else pygame.mixer.music.unpause()
                             
-                        elif name == 'botaoVoltar': self.voltar = True, efeitos_sonoros['click_som'].play()
-                        elif name == 'botaoJogar': self.play = True, efeitos_sonoros['click_som'].play()
+                        elif name == 'botaoVoltar':
+                            self.voltar = True
+                            efeitos_sonoros['click_som'].play()
+                        elif name == 'botaoJogar':
+                            self.play = True
+                            efeitos_sonoros['click_som'].play()
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.voltar = True
         return True
@@ -203,7 +209,7 @@ class TelaOptions():
         if self.voltar:
             return TelaInicial(self.tela)
         elif self.play:
-            return TelaJogo(self.tela, opcoes = self.opcoes)
+            return TelaJogo(self.tela, nome='', opcoes=self.opcoes)
         else:
             return self
         

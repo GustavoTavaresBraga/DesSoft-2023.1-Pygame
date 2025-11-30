@@ -1,5 +1,6 @@
 # Importa as bibliotecas que serão utilizadas no código
 import pygame
+import random
 from sprites import sprites, efeitos_sonoros
 
 
@@ -69,25 +70,19 @@ class Heart(Entity):
     def update(self):
         super().update()
         self.rect.centerx += self.speedX
-        if self.rect.right < -55:
-            self.rect.left = 555
-        if self.rect.left > 555:
-            self.rect.right = -55
-
-
 # Cria a classe do jogador
 class Player(Entity):
-    def __init__(self, world):
+    def __init__(self, world, vidas=3):
         pygame.sprite.Sprite.__init__(self)
         super().__init__(world, 250, 690, 'chicken')
-
+        self.pos = [10, 3]
         self.rect = pygame.Rect(230,650,40,40)
         self.image = sprites['chicken']
         self.red_image = sprites['chickenRed']
         self.movement = None
         self.moveu = 0
         self.onBoat = False
-        self.vidas = 3
+        self.vidas = vidas
         self.speedBoat = 0
         self.score = 0
         self.immunity = 0
@@ -98,10 +93,10 @@ class Player(Entity):
         super().update()
         # nomeando as direções do jogador baseado na seta em que o usuario aperta ou segura
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.movement is None and self.rect.bottom >= 50 and self.rect.right > 10 and self.rect.left<490: self.movement = 'cima'
-        if keys[pygame.K_DOWN] and self.movement is None and self.rect.bottom <= 750 and self.rect.right > 10 and self.rect.left<490: self.movement = 'baixo'
-        if keys[pygame.K_LEFT] and self.movement is None: self.movement = 'esquerda'
-        if keys[pygame.K_RIGHT] and self.movement is None: self.movement = 'direita'
+        if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.movement is None and self.rect.bottom >= 50 and self.rect.right > 10 and self.rect.left<490: self.movement = 'cima'
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and self.movement is None and self.rect.bottom <= 750 and self.rect.right > 10 and self.rect.left<490: self.movement = 'baixo'
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and self.movement is None: self.movement = 'esquerda'
+        if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and self.movement is None: self.movement = 'direita'
         self.rect.centerx += self.speedBoat
         # criando as velocidades em que o jogador ira se mexer, baseado na tecla em que ele apertou
         if self.movement == 'cima':

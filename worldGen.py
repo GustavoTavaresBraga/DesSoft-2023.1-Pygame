@@ -2,23 +2,28 @@ from chicken import *
 from sprites import *
 import random
 class World:
-    def __init__(self,screen):
-        self.player = Player(self)
+    def __init__(self, screen, opcoes=None):
+        self.opcoes = opcoes if opcoes else {'Vidas': 3, 'Velocidade': 2, 'NBarcos': 3, 'NMinecarts': 3, 'VB': 2, 'VM': 2}
+        self.player = Player(self, vidas=self.opcoes['Vidas'])
         self.entities = []
         self.screen = screen
-        self.speed = 1
+        self.speed = self.opcoes['Velocidade']
         self.y = 0
         self.previousSpeed = 0
         self.biomes = {
             0: Plains,
-            100: Nether,
-            250: NetherHard,
-            500: End
+            50: Nether,
+            100: NetherHard,
+            200: End
         }
+        self.map = [['X']*9]*16
         self.currentBiome = self.biomes[0](self)
         self.currentBiome.load_sprites()
         for i in range(16):
-            self.generate(y=800-(i*50))
+            new_row = self.currentBiome.new_row(y=800-(i*50))
+            for entity in new_row:
+                self.entities.append(entity)
+        
     def draw(self):
         for entity in self.entities:
             if entity.entity_type == 'boat' or entity.entity_type == 'minecart' or entity.entity_type == 'heart':
@@ -45,8 +50,22 @@ class World:
         return self.entities
     def generate(self, y=0):
         new_row = self.currentBiome.new_row(y)
+        row = []
+        
+        for entity in new_row:
+            if entity.entity_type == 'grass' or entity.entity_type == 'rails':
+                row.append('X')
+            if entity.entity_type == 'boat':
+                row = ['X']*9
+                break
+            if entity.entity_type == 'water':
+                row.append(' ')
+        self.map.append(row)
+        mapa = [row.copy() for row in self.map[self.player.score+2:]]
+        mapa[0][min(round(self.player.rect.x/ 50), 8)] = 'P'
         for entity in new_row:
             self.entities.append(entity)
+
 class Biome:
     def __init__(self, world):
         self.world = world
@@ -93,11 +112,12 @@ class Biome:
 class Plains(Biome):
     def __init__(self, world):
         super().__init__(world)
+        opcoes = world.opcoes
         self.weights = [5, 2, 3] # grass water rails
-        self.boatChance = 0.35
-        self.minecartChance = 0.25
+        self.boatChance = 0.1 * opcoes.get('NBarcos', 3)
+        self.minecartChance = 0.08 * opcoes.get('NMinecarts', 3)
         self.heartChance = 0.005
-        self.speeds = [2, 8]
+        self.speeds = [opcoes.get('VB', 2), opcoes.get('VM', 2) + 6]
         self.biomeName = 'plains'
         self.sprites = {
             'grass': 'grass.png',
@@ -110,11 +130,12 @@ class Plains(Biome):
 class Nether(Biome):
     def __init__(self, world):
         super().__init__(world)
+        opcoes = world.opcoes
         self.weights = [4, 5,2] # grass water rails
-        self.boatChance = 0.45
-        self.minecartChance = 0.2
+        self.boatChance = 0.12 * opcoes.get('NBarcos', 3)
+        self.minecartChance = 0.07 * opcoes.get('NMinecarts', 3)
         self.heartChance = 0.003
-        self.speeds = [3, 6]
+        self.speeds = [opcoes.get('VB', 2) + 1, opcoes.get('VM', 2) + 4]
         self.biomeName = 'nether'
         self.sprites = {
             'grass': 'netherack.png',
@@ -124,11 +145,12 @@ class Nether(Biome):
 class NetherHard(Biome):
     def __init__(self, world):
         super().__init__(world)
+        opcoes = world.opcoes
         self.weights = [3, 5,3] # grass water rails
-        self.boatChance = 0.4
-        self.minecartChance = 0.3
+        self.boatChance = 0.13 * opcoes.get('NBarcos', 3)
+        self.minecartChance = 0.1 * opcoes.get('NMinecarts', 3)
         self.heartChance = 0.001
-        self.speeds = [4, 7]
+        self.speeds = [opcoes.get('VB', 2) + 2, opcoes.get('VM', 2) + 5]
         self.biomeName = 'netherHard'
         self.sprites = {
             'grass': 'netherack.png',
@@ -138,10 +160,12 @@ class NetherHard(Biome):
 class End(Biome):
     def __init__(self, world):
         super().__init__(world)
+        opcoes = world.opcoes
         self.weights = [5, 5,0] # grass water rails
-        self.boatChance = 0.2
-        self.minecartChance = 0.2
-        self.speeds = [6, 10]
+        self.boatChance = 0.07 * opcoes.get('NBarcos', 3)
+        self.minecartChance = 0.07 * opcoes.get('NMinecarts', 3)
+        self.heartChance = 0.001
+        self.speeds = [opcoes.get('VB', 2) + 4, opcoes.get('VM', 2) + 8]
         self.stickTo = ['boat', 'grass']
         self.biomeName = 'end'
         self.sprites = {
@@ -156,9 +180,35 @@ class End(Biome):
         while set(remove) == set(self.previousRow):
             remove = random.choices(range(10), k=4)
         self.previousRow = remove
-
         for i in remove:
             if row[i].entity_type == 'grass':
                 row[i].entity_type = 'water'
                 row[i].image = sprites['water']
+        
         return row
+def can_reach_last_layer(grid):
+    gridCopy = [row.copy() for row in grid]
+    posInicial = [len(grid) - 1, grid[-1].index('P')]
+    new_pos = posInicial
+    found = False
+    direction = 1
+    for i in range(100):
+        print(new_pos)
+        if new_pos[0] == 0:
+            found = True
+        if grid[new_pos[0]-1][new_pos[1]] == 'X':
+            new_pos = [new_pos[0]-1, new_pos[1]]
+        elif grid[new_pos[0]][new_pos[1]+direction] == 'X':
+            new_pos = [new_pos[0], new_pos[1]+direction]
+        elif grid[new_pos[0]][new_pos[1]-direction] == 'X':
+            new_pos = [new_pos[0], new_pos[1]-direction]
+        else:
+            direction = -direction
+            new_pos = posInicial
+            grid = [row.copy() for row in gridCopy]
+
+        grid[new_pos[0]][new_pos[1]] = ' '
+    if found:
+        return True
+    else:
+        return False

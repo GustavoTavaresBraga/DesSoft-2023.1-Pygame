@@ -1,1 +1,8 @@
+.gitignore
+/DesSoft-2023.1-PygameVenv/
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+scores.csv
